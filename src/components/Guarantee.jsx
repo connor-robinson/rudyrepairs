@@ -2,7 +2,7 @@ import { MdVerifiedUser, MdCheck } from 'react-icons/md';
 
 function Guarantee() {
   return (
-    <section className="py-32 bg-dark-matte border-y border-white/5">
+    <section className="py-20 bg-dark-matte border-y border-white/5">
       <div className="max-w-4xl mx-auto px-4 text-center">
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 border border-primary/30 mb-10">
           <MdVerifiedUser className="text-primary text-4xl" />

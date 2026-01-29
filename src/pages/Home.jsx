@@ -2,6 +2,7 @@ import Header from '../components/Header';
 import Hero from '../components/Hero';
 import WhyUs from '../components/WhyUs';
 import Pricing from '../components/Pricing';
+import ServiceArea from '../components/ServiceArea';
 import Guarantee from '../components/Guarantee';
 import Reviews from '../components/Reviews';
 import PartsPolicy from '../components/PartsPolicy';
@@ -15,6 +16,7 @@ function Home() {
       <Hero />
       <WhyUs />
       <Pricing />
+      <ServiceArea />
       <Guarantee />
       <Reviews />
       <PartsPolicy />

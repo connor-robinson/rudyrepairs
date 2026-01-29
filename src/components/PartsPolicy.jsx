@@ -2,7 +2,7 @@ import { MdInfo, MdVerified } from 'react-icons/md';
 
 function PartsPolicy() {
   return (
-    <section className="py-32 bg-dark-matte border-b border-white/5">
+    <section className="py-20 bg-dark-matte border-b border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="font-display text-4xl font-black uppercase text-white mb-10">Parts Buying Policy</h2>

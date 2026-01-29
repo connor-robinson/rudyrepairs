@@ -2,12 +2,12 @@ import { MdVerified, MdHistoryEdu, MdCheckCircle } from 'react-icons/md';
 
 function WhyUs() {
   return (
-    <section className="py-32 bg-dark-matte" id="why-us">
+    <section className="py-20 bg-dark-matte" id="why-us">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-20 items-end mb-24">
           <div>
             <h2 className="font-display text-5xl md:text-6xl font-black uppercase tracking-tighter text-white mb-6">
-              Why Choose <span className="text-primary">Us</span>
+              Why <span className="text-primary">Us</span>
             </h2>
           </div>
         </div>

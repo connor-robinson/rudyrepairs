@@ -32,11 +32,11 @@ function Pricing() {
   };
 
   return (
-    <section className="py-32 bg-dark-charcoal" id="pricing">
+    <section className="py-20 bg-dark-charcoal" id="pricing">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-16">
           <div className="max-w-xl">
-            <h2 className="font-display text-5xl font-black uppercase mb-4 text-white whitespace-nowrap">
+            <h2 className="font-display text-5xl font-black uppercase mb-4 text-white">
               Transparent <span className="text-primary">Pricing</span>
             </h2>
             <p className="text-slate-400 text-lg font-light">No hidden fees, no surprises.</p>

@@ -2,7 +2,7 @@ import { MdStar, MdStarHalf, MdFormatQuote } from 'react-icons/md';
 
 function Reviews() {
   return (
-    <section className="py-32 bg-dark-charcoal" id="reviews">
+    <section className="py-20 bg-dark-charcoal" id="reviews">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-24">
           <h2 className="font-display text-5xl font-black uppercase text-white mb-8">

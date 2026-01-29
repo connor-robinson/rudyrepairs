@@ -96,32 +96,51 @@ function ServiceArea() {
   }, []);
 
   const onPlaceChanged = useCallback(() => {
-    if (autocomplete) {
+    if (!autocomplete || !window.google || !window.google.maps) {
+      return;
+    }
+
+    try {
       const place = autocomplete.getPlace();
+      if (!place) {
+        return;
+      }
+
       if (place.formatted_address) {
         setAddress(place.formatted_address);
         // Automatically check coverage when a place is selected
         // Use the address directly for geocoding
         if (place.geometry && place.geometry.location) {
-          const userLat = place.geometry.location.lat();
-          const userLng = place.geometry.location.lng();
+          const userLat = typeof place.geometry.location.lat === 'function' 
+            ? place.geometry.location.lat() 
+            : place.geometry.location.lat;
+          const userLng = typeof place.geometry.location.lng === 'function' 
+            ? place.geometry.location.lng() 
+            : place.geometry.location.lng;
           
-          const calculatedDistance = calculateDistance(
-            DEFAULT_CENTER.lat,
-            DEFAULT_CENTER.lng,
-            userLat,
-            userLng
-          );
+          if (!isNaN(userLat) && !isNaN(userLng)) {
+            const calculatedDistance = calculateDistance(
+              DEFAULT_CENTER.lat,
+              DEFAULT_CENTER.lng,
+              userLat,
+              userLng
+            );
 
-          setUserLocation({ lat: userLat, lng: userLng });
-          setDistance(calculatedDistance);
-          setIsInServiceArea(calculatedDistance <= SERVICE_RADIUS_MILES);
-          setLoading(false);
+            setUserLocation({ lat: userLat, lng: userLng });
+            setDistance(calculatedDistance);
+            setIsInServiceArea(calculatedDistance <= SERVICE_RADIUS_MILES);
+            setLoading(false);
 
-          // Center map on user location
-          if (map) {
-            map.setCenter({ lat: userLat, lng: userLng });
-            map.setZoom(11);
+            // Center map on user location
+            if (map) {
+              map.setCenter({ lat: userLat, lng: userLng });
+              map.setZoom(11);
+            }
+          } else {
+            // Fallback to geocoding if coordinates are invalid
+            setTimeout(() => {
+              handleCheckAddress(place.formatted_address);
+            }, 100);
           }
         } else {
           // Fallback to geocoding if geometry not available
@@ -135,6 +154,9 @@ function ServiceArea() {
           handleCheckAddress(place.name);
         }, 100);
       }
+    } catch (error) {
+      console.error('Error processing place:', error);
+      setError('Error processing selected location. Please try again.');
     }
   }, [autocomplete, map]);
 
@@ -405,24 +427,26 @@ function ServiceArea() {
                 />
 
                 {/* Service center marker - Abingdon */}
-                <Marker
-                  position={DEFAULT_CENTER}
-                  title="Rudy's Repair - Abingdon Service Center"
-                  icon={{
-                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="24" cy="24" r="20" fill="#E11D48" stroke="#fff" stroke-width="3"/>
-                        <path d="M24 12 L24 36 M12 24 L36 24" stroke="white" stroke-width="3" stroke-linecap="round"/>
-                        <circle cx="24" cy="24" r="8" fill="white"/>
-                      </svg>
-                    `),
-                    scaledSize: new window.google.maps.Size(48, 48),
-                    anchor: new window.google.maps.Point(24, 24)
-                  }}
-                />
+                {window.google?.maps && (
+                  <Marker
+                    position={DEFAULT_CENTER}
+                    title="Rudy's Repair - Abingdon Service Center"
+                    icon={{
+                      url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <circle cx="24" cy="24" r="20" fill="#E11D48" stroke="#fff" stroke-width="3"/>
+                          <path d="M24 12 L24 36 M12 24 L36 24" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                          <circle cx="24" cy="24" r="8" fill="white"/>
+                        </svg>
+                      `),
+                      scaledSize: new window.google.maps.Size(48, 48),
+                      anchor: new window.google.maps.Point(24, 24)
+                    }}
+                  />
+                )}
 
                 {/* User location marker */}
-                {userLocation && (
+                {userLocation && window.google?.maps && (
                   <Marker
                     position={userLocation}
                     title={`Your Location - ${distance ? distance.toFixed(1) + ' miles from Abingdon' : ''}`}
@@ -463,7 +487,7 @@ function ServiceArea() {
         <div className="glass-card p-8 md:p-12">
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="flex-1 relative">
-              {hasApiKey ? (
+              {hasApiKey && window.google?.maps?.places ? (
                 <Autocomplete
                   onLoad={onAutocompleteLoad}
                   onPlaceChanged={onPlaceChanged}

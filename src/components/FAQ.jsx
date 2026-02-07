@@ -24,28 +24,27 @@ function FAQ() {
   ];
 
   return (
-    <section className="py-20 bg-dark-charcoal" id="faq">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="font-display text-5xl font-black uppercase mb-4 text-white">FAQ</h2>
-          <div className="h-1.5 w-16 bg-primary mx-auto mb-10"></div>
+    <section className="py-16 bg-[#121212] border-b border-[#362b2b]/50" id="faq">
+      <div className="max-w-[1200px] mx-auto px-6 md:px-20">
+        <div className="mb-12 text-center">
+          <h2 className="text-white text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-12">FAQ</h2>
         </div>
-        <div className="space-y-4">
+        <div className="space-y-4 max-w-3xl mx-auto">
           {faqs.map((faq, index) => (
-            <div key={index} className="border border-white/10 bg-dark-matte overflow-hidden">
+            <div key={index} className="border border-[#362b2b] rounded-lg bg-[#1a1a1a] overflow-hidden">
               <button
-                className="w-full flex justify-between items-center p-8 text-left hover:bg-white/5 transition-all"
+                className="w-full flex justify-between items-center p-6 text-left hover:bg-white/5 transition-all"
                 onClick={() => toggleFAQ(index)}
               >
-                <span className="font-black text-lg uppercase tracking-tight text-white">{faq.question}</span>
+                <span className="text-white text-base font-medium">{faq.question}</span>
                 {openIndex === index ? (
-                  <MdExpandLess className="text-primary text-2xl" />
+                  <MdExpandLess className="text-[#a12b2b] text-xl" />
                 ) : (
-                  <MdExpandMore className="text-primary text-2xl" />
+                  <MdExpandMore className="text-[#a12b2b] text-xl" />
                 )}
               </button>
               {openIndex === index && (
-                <div className="p-8 pt-0 text-slate-400 text-lg border-t border-white/5 leading-relaxed">
+                <div className="px-6 pb-6 text-[#b5a1a1] text-sm border-t border-[#362b2b] leading-relaxed pt-4">
                   {faq.answer}
                 </div>
               )}

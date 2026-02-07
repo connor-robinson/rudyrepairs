@@ -11,6 +11,9 @@ const DEFAULT_CENTER = {
 const SERVICE_RADIUS_MILES = 20;
 const SERVICE_RADIUS_METERS = SERVICE_RADIUS_MILES * 1609.34; // Convert miles to meters
 
+// Static libraries array for LoadScript (must be outside component to prevent reloads)
+const LIBRARIES = ['places'];
+
 const mapContainerStyle = {
   width: '100%',
   height: '500px',
@@ -370,28 +373,29 @@ function ServiceArea() {
   const hasApiKey = GOOGLE_MAPS_API_KEY && GOOGLE_MAPS_API_KEY !== '';
 
   return (
-    <section className="py-20 bg-dark-charcoal" id="location">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="font-display text-5xl font-black uppercase text-white mb-6">
-            Our <span className="text-primary">Location</span>
+    <section className="py-16 bg-[#121212] border-b border-[#362b2b]/50" id="location">
+      <div className="max-w-[1200px] mx-auto px-6 md:px-20">
+        <div className="mb-12">
+          <p className="text-[#b5a1a1] text-xs font-bold tracking-[0.2em] uppercase mb-4">Service Area</p>
+          <h2 className="text-white text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-6">
+            Our <span className="text-[#a12b2b]">Location</span>
           </h2>
-          <p className="text-slate-400 text-lg font-light max-w-2xl mx-auto">
+          <p className="text-[#b5a1a1] text-sm font-light max-w-2xl">
             We service customers within a 20-mile radius of Abingdon, Oxfordshire. Explore the map to see our coverage area, or enter your address below to check if we cover your area.
           </p>
         </div>
 
-        <div className="glass-card overflow-hidden mb-8">
+        <div className="border border-[#362b2b] rounded-lg overflow-hidden mb-8">
           {!hasApiKey ? (
-            <div className="h-[500px] flex items-center justify-center bg-dark-matte">
+            <div className="h-[500px] flex items-center justify-center bg-[#1a1a1a]">
               <div className="text-center px-6">
-                <p className="text-slate-400 mb-4">Google Maps API key required</p>
-                <p className="text-sm text-slate-500 mb-2">
-                  Add your Google Maps API key to <code className="bg-white/5 px-2 py-1 rounded text-xs">VITE_GOOGLE_MAPS_API_KEY</code> in your <code className="bg-white/5 px-2 py-1 rounded text-xs">.env</code> file
+                <p className="text-[#b5a1a1] mb-4">Google Maps API key required</p>
+                <p className="text-sm text-[#b5a1a1] mb-2">
+                  Add your Google Maps API key to <code className="bg-[#121212] px-2 py-1 rounded-lg text-xs border border-[#362b2b]">VITE_GOOGLE_MAPS_API_KEY</code> in your <code className="bg-[#121212] px-2 py-1 rounded-lg text-xs border border-[#362b2b]">.env</code> file
                 </p>
-                <p className="text-xs text-slate-600 mt-4">
+                <p className="text-xs text-[#b5a1a1] mt-4">
                   Get your API key from{' '}
-                  <a href="https://console.cloud.google.com/google/maps-apis" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  <a href="https://console.cloud.google.com/google/maps-apis" target="_blank" rel="noopener noreferrer" className="text-[#a12b2b] hover:underline">
                     Google Cloud Console
                   </a>
                 </p>
@@ -400,7 +404,7 @@ function ServiceArea() {
           ) : (
             <LoadScript 
               googleMapsApiKey={GOOGLE_MAPS_API_KEY}
-              libraries={['places']}
+              libraries={LIBRARIES}
             >
               <GoogleMap
                 mapContainerStyle={mapContainerStyle}
@@ -468,23 +472,23 @@ function ServiceArea() {
         </div>
 
         <div className="mb-8 flex flex-col md:flex-row items-center justify-center gap-6 text-sm">
-          <div className="flex items-center gap-2 text-slate-500">
-            <span className="inline-block w-4 h-4 rounded-full bg-primary/20 border-2 border-primary"></span>
+          <div className="flex items-center gap-2 text-[#b5a1a1]">
+            <span className="inline-block w-4 h-4 rounded-full bg-[#a12b2b]/20 border-2 border-[#a12b2b]"></span>
             <span>20-mile service radius</span>
           </div>
-          <div className="flex items-center gap-2 text-slate-500">
-            <span className="inline-block w-4 h-4 rounded-full bg-primary mr-2"></span>
+          <div className="flex items-center gap-2 text-[#b5a1a1]">
+            <span className="inline-block w-4 h-4 rounded-full bg-[#a12b2b] mr-2"></span>
             <span>Abingdon Service Center</span>
           </div>
           {userLocation && (
-            <div className="flex items-center gap-2 text-slate-500">
-              <span className={`inline-block w-4 h-4 rounded-full ${isInServiceArea ? 'bg-green-500' : 'bg-primary'} mr-2`}></span>
+            <div className="flex items-center gap-2 text-[#b5a1a1]">
+              <span className={`inline-block w-4 h-4 rounded-full ${isInServiceArea ? 'bg-green-500' : 'bg-[#a12b2b]'} mr-2`}></span>
               <span>Your Location</span>
             </div>
           )}
         </div>
 
-        <div className="glass-card p-8 md:p-12">
+        <div className="border border-[#362b2b] rounded-lg p-8 md:p-12 bg-[#1a1a1a]">
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="flex-1 relative">
               {hasApiKey && window.google?.maps?.places ? (
@@ -503,7 +507,7 @@ function ServiceArea() {
                     onChange={(e) => setAddress(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Enter your address (e.g., Abingdon, Oxfordshire)"
-                    className="w-full bg-dark-matte border border-white/10 text-white px-6 py-4 pr-24 rounded-sm focus:outline-none focus:border-primary transition-colors placeholder:text-slate-500"
+                    className="w-full bg-[#121212] border border-[#362b2b] text-white px-6 py-4 pr-24 rounded-lg focus:outline-none focus:border-[#a12b2b] transition-colors placeholder:text-[#362b2b]"
                   />
                 </Autocomplete>
               ) : (
@@ -513,27 +517,27 @@ function ServiceArea() {
                   onChange={(e) => setAddress(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Enter your address (e.g., Abingdon, Oxfordshire)"
-                  className="w-full bg-dark-matte border border-white/10 text-white px-6 py-4 pr-24 rounded-sm focus:outline-none focus:border-primary transition-colors placeholder:text-slate-500"
+                  className="w-full bg-[#121212] border border-[#362b2b] text-white px-6 py-4 pr-24 rounded-lg focus:outline-none focus:border-[#a12b2b] transition-colors placeholder:text-[#362b2b]"
                 />
               )}
               <button
                 type="button"
                 onClick={handleGetLocation}
                 disabled={locationLoading}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-10 h-10 border border-white/10 hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded-sm z-10"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-10 h-10 border border-[#362b2b] hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded-lg z-10"
                 title="Use my current location"
               >
                 {locationLoading ? (
-                  <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-5 h-5 border-2 border-[#a12b2b] border-t-transparent rounded-full animate-spin"></div>
                 ) : (
-                  <MdMyLocation className="text-primary text-xl" />
+                  <MdMyLocation className="text-[#a12b2b] text-xl" />
                 )}
               </button>
             </div>
             <button
               onClick={handleCheckAddress}
               disabled={loading || locationLoading}
-              className="bg-primary hover:bg-accent text-white px-8 py-4 rounded-sm font-black uppercase tracking-tighter transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed min-h-[56px]"
+              className="bg-[#a12b2b] hover:bg-[#a12b2b]/90 text-white px-8 py-4 rounded-lg text-sm font-bold tracking-[0.25em] uppercase transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed min-h-[56px]"
             >
               {loading ? (
                 <>
@@ -550,17 +554,17 @@ function ServiceArea() {
           </div>
 
           {error && (
-            <div className="bg-primary/10 border border-primary/30 text-primary px-6 py-4 rounded-sm mb-6 flex items-center gap-3">
+            <div className="bg-[#a12b2b]/10 border border-[#a12b2b]/30 text-[#a12b2b] px-6 py-4 rounded-lg mb-6 flex items-center gap-3">
               <MdCancel className="text-xl flex-shrink-0" />
               <p className="text-sm font-medium">{error}</p>
             </div>
           )}
 
           {isInServiceArea !== null && (
-            <div className={`px-6 py-4 rounded-sm mb-6 flex items-center gap-3 ${
+            <div className={`px-6 py-4 rounded-lg mb-6 flex items-center gap-3 ${
               isInServiceArea
                 ? 'bg-green-500/10 border border-green-500/30 text-green-400'
-                : 'bg-primary/10 border border-primary/30 text-primary'
+                : 'bg-[#a12b2b]/10 border border-[#a12b2b]/30 text-[#a12b2b]'
             }`}>
               {isInServiceArea ? (
                 <>

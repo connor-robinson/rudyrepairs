@@ -17,3 +17,4 @@ export const cssVariables = {
 // Export for use in Tailwind config (already configured in tailwind.config.js)
 export default colors;
 
+

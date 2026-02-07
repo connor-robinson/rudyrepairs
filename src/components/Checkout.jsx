@@ -1,51 +1,266 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { MdArrowBack, MdExpandMore, MdLock, MdContactless, MdCreditCard, MdLocationOn, MdMyLocation } from 'react-icons/md';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { MdArrowBack, MdExpandMore, MdMyLocation, MdCalendarToday, MdAccessTime, MdChevronLeft, MdChevronRight, MdCheckCircle, MdError } from 'react-icons/md';
+import { services, formatPrice } from '../data/services';
+import { supabase } from '../lib/supabase';
 
 function Checkout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const [location, setLocation] = useState('');
-  const [locationLoading, setLocationLoading] = useState(false);
-  const [locationError, setLocationError] = useState('');
-  const [selectedService, setSelectedService] = useState({
-    name: "Oil Change & Filter",
-    description: "Premium Synthetic Oil & Filter",
-    price: "£89.00"
+  const [address, setAddress] = useState('');
+  const [addressLoading, setAddressLoading] = useState(false);
+  const [addressError, setAddressError] = useState('');
+  
+  // Form state
+  const [customerName, setCustomerName] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [vehicleModel, setVehicleModel] = useState('');
+  
+  // Calendar state
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
+  
+  // Appointment submission state
+  const [submitting, setSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  
+  // Get order data from location state, or default to empty
+  const orderData = location.state || null;
+  const [orderItems, setOrderItems] = useState(() => {
+    if (orderData && orderData.items) {
+      return orderData.items;
+    }
+    // Default to first orderable service if no order data
+    const defaultService = services.find(s => s.orderable);
+    return defaultService ? [defaultService] : [];
   });
 
-  const services = [
-    {
-      name: "Oil Change & Filter",
-      description: "Premium synthetic service",
-      price: "£89.00"
-    },
-    {
-      name: "Full Vehicle Diagnostics",
-      description: "Comprehensive ECU scan",
-      price: "£120.00"
-    },
-    {
-      name: "Brake Pad Replacement",
-      description: "Front or rear ceramic pads",
-      price: "£145.00"
-    },
-    {
-      name: "Annual Performance Tune",
-      description: "Full system optimization",
-      price: "£299.00"
-    }
+  const orderableServices = services.filter(s => s.orderable);
+  
+  const totalPrice = orderItems.reduce((sum, item) => sum + item.price, 0);
+  const isBundle = orderItems.length > 1;
+  
+  // Available time slots (9 AM to 5 PM, every hour)
+  const timeSlots = [
+    '09:00', '10:00', '11:00', '12:00', 
+    '13:00', '14:00', '15:00', '16:00', '17:00'
   ];
 
   const handleServiceSelect = (service) => {
-    setSelectedService({
-      name: service.name,
-      description: service.description === "Premium synthetic service" ? "Premium Synthetic Oil & Filter" : service.description,
-      price: service.price
-    });
+    // If selecting a service, replace current order with single service
+    setOrderItems([service]);
     setDropdownOpen(false);
   };
+
+  // Calendar helper functions
+  const getDaysInMonth = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    
+    const days = [];
+    
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null);
+    }
+    
+    // Add all days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(new Date(year, month, day));
+    }
+    
+    return days;
+  };
+
+  const isToday = (date) => {
+    if (!date) return false;
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+           date.getMonth() === today.getMonth() &&
+           date.getFullYear() === today.getFullYear();
+  };
+
+  const isPastDate = (date) => {
+    if (!date) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
+    return checkDate < today;
+  };
+
+  const isSelectedDate = (date) => {
+    if (!date || !selectedDate) return false;
+    return date.getDate() === selectedDate.getDate() &&
+           date.getMonth() === selectedDate.getMonth() &&
+           date.getFullYear() === selectedDate.getFullYear();
+  };
+
+  const formatDateDisplay = (date) => {
+    if (!date) return '';
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('en-GB', options);
+  };
+
+  const handleDateSelect = async (date) => {
+    if (date && !isPastDate(date)) {
+      setSelectedDate(date);
+      setSelectedTime(null); // Reset time when date changes
+      await checkAvailability(date);
+    }
+  };
+
+  // Check availability for a specific date
+  const checkAvailability = async (date) => {
+    if (!date) return;
+    
+    setCheckingAvailability(true);
+    try {
+      const dateString = date.toISOString().split('T')[0];
+      
+      // Check if slots exist for this date
+      const { data: slots, error } = await supabase
+        .from('availability_slots')
+        .select('*')
+        .eq('date', dateString)
+        .eq('is_available', true)
+        .order('time_slot', { ascending: true });
+
+      if (error) throw error;
+
+      // If no slots exist, create default available slots
+      if (!slots || slots.length === 0) {
+        const defaultSlots = timeSlots.map(time => ({
+          date: dateString,
+          time_slot: time,
+          is_available: true
+        }));
+
+        const { data: inserted, error: insertError } = await supabase
+          .from('availability_slots')
+          .insert(defaultSlots)
+          .select();
+
+        if (insertError) throw insertError;
+        setAvailableTimeSlots(inserted.map(s => s.time_slot));
+      } else {
+        setAvailableTimeSlots(slots.map(s => s.time_slot));
+      }
+    } catch (error) {
+      console.error('Error checking availability:', error);
+      // If Supabase isn't configured, allow all time slots
+      setAvailableTimeSlots(timeSlots);
+    } finally {
+      setCheckingAvailability(false);
+    }
+  };
+
+  // Handle appointment submission
+  const handleConfirmAppointment = async () => {
+    // Validate form
+    if (!customerName || !customerEmail || !selectedDate || !selectedTime) {
+      setSubmitError('Please fill in all required fields and select a date and time.');
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(customerEmail)) {
+      setSubmitError('Please enter a valid email address.');
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitError('');
+
+    try {
+      const appointmentDate = selectedDate.toISOString().split('T')[0];
+      
+      // First, check if the slot is still available
+      const { data: slotCheck, error: slotError } = await supabase
+        .from('availability_slots')
+        .select('*')
+        .eq('date', appointmentDate)
+        .eq('time_slot', selectedTime)
+        .eq('is_available', true)
+        .single();
+
+      if (slotError || !slotCheck) {
+        throw new Error('This time slot is no longer available. Please select another time.');
+      }
+
+      // Create appointment
+      const { data: appointment, error: appointmentError } = await supabase
+        .from('appointments')
+        .insert({
+          customer_name: customerName,
+          customer_email: customerEmail,
+          customer_phone: customerPhone || null,
+          vehicle_model: vehicleModel || null,
+          address: address || null,
+          appointment_date: appointmentDate,
+          appointment_time: selectedTime,
+          services: orderItems,
+          total_price: totalPrice,
+          status: 'pending'
+        })
+        .select()
+        .single();
+
+      if (appointmentError) throw appointmentError;
+
+      // Trigger email notification (via Supabase Edge Function or webhook)
+      try {
+        // Call email function if available
+        const { error: emailError } = await supabase.functions.invoke('send-appointment-email', {
+          body: { appointmentId: appointment.id }
+        });
+        
+        if (emailError) {
+          console.warn('Email notification failed:', emailError);
+          // Don't fail the appointment if email fails
+        }
+      } catch (emailErr) {
+        console.warn('Email service not configured:', emailErr);
+      }
+
+      setSubmitSuccess(true);
+      
+      // Redirect after 3 seconds
+      setTimeout(() => {
+        navigate('/', { state: { appointmentConfirmed: true } });
+      }, 3000);
+
+    } catch (error) {
+      console.error('Error creating appointment:', error);
+      setSubmitError(error.message || 'Failed to create appointment. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handlePreviousMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+  };
+
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                      'July', 'August', 'September', 'October', 'November', 'December'];
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -67,12 +282,12 @@ function Checkout() {
   // Get user's location and reverse geocode to address
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
-      setLocationError('Geolocation is not supported by your browser');
+      setAddressError('Geolocation is not supported by your browser');
       return;
     }
 
-    setLocationLoading(true);
-    setLocationError('');
+    setAddressLoading(true);
+    setAddressError('');
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
@@ -96,29 +311,29 @@ function Checkout() {
           const data = await response.json();
           
           // Format the address nicely
-          const address = data.address;
+          const addressData = data.address;
           let formattedAddress = '';
           
-          if (address.road) formattedAddress += address.road;
-          if (address.city || address.town || address.village) {
+          if (addressData.road) formattedAddress += addressData.road;
+          if (addressData.city || addressData.town || addressData.village) {
             if (formattedAddress) formattedAddress += ', ';
-            formattedAddress += address.city || address.town || address.village;
+            formattedAddress += addressData.city || addressData.town || addressData.village;
           }
-          if (address.county && !formattedAddress.includes(address.county)) {
+          if (addressData.county && !formattedAddress.includes(addressData.county)) {
             if (formattedAddress) formattedAddress += ', ';
-            formattedAddress += address.county;
+            formattedAddress += addressData.county;
           }
-          if (address.postcode) {
-            if (formattedAddress) formattedAddress += ` ${address.postcode}`;
-            else formattedAddress = address.postcode;
+          if (addressData.postcode) {
+            if (formattedAddress) formattedAddress += ` ${addressData.postcode}`;
+            else formattedAddress = addressData.postcode;
           }
 
-          setLocation(formattedAddress || data.display_name || 'Location found');
-          setLocationLoading(false);
+          setAddress(formattedAddress || data.display_name || 'Location found');
+          setAddressLoading(false);
         } catch (error) {
           console.error('Geocoding error:', error);
-          setLocationError('Could not determine address. Please enter manually.');
-          setLocationLoading(false);
+          setAddressError('Could not determine address. Please enter manually.');
+          setAddressLoading(false);
         }
       },
       (error) => {
@@ -138,8 +353,8 @@ function Checkout() {
             errorMessage += 'An unknown error occurred.';
             break;
         }
-        setLocationError(errorMessage);
-        setLocationLoading(false);
+        setAddressError(errorMessage);
+        setAddressLoading(false);
       },
       {
         enableHighAccuracy: true,
@@ -180,51 +395,112 @@ function Checkout() {
                   className="dropdown-trigger w-full text-left flex items-center justify-between bg-[#1a1a1a] border-b border-[#362b2b] p-6 -mx-6 md:mx-0 md:rounded-lg transition-all duration-200 active:bg-[#252525] hover:bg-[#1e1e1e]"
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                 >
-                  <div className="space-y-1">
-                    <h1 className="text-white text-3xl md:text-4xl font-light leading-tight tracking-tight">{selectedService.name}</h1>
-                    <p className="text-[#b5a1a1] text-sm font-light">{selectedService.description}</p>
+                  <div className="space-y-1 flex-1">
+                    {isBundle ? (
+                      <>
+                        <h1 className="text-white text-3xl md:text-4xl font-light leading-tight tracking-tight">
+                          Service Bundle ({orderItems.length} items)
+                        </h1>
+                        <p className="text-[#b5a1a1] text-sm font-light">
+                          {orderItems.map(item => item.name).join(', ')}
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <h1 className="text-white text-3xl md:text-4xl font-light leading-tight tracking-tight">
+                          {orderItems[0]?.name || 'Select a service'}
+                        </h1>
+                        <p className="text-[#b5a1a1] text-sm font-light">
+                          {orderItems[0]?.description || ''}
+                        </p>
+                      </>
+                    )}
                   </div>
                   <div className="flex items-center gap-6">
-                    <p className="text-white text-2xl font-normal">{selectedService.price}</p>
+                    <p className="text-white text-2xl font-normal">{formatPrice(totalPrice)}</p>
                     <MdExpandMore className={`text-[#b5a1a1] group-hover:text-white transition-all transform ${dropdownOpen ? 'rotate-180' : ''}`} />
                   </div>
                 </button>
                 {dropdownOpen && (
-                  <div className="absolute top-full left-0 w-full z-20 bg-[#121212] border border-[#362b2b] rounded-b-lg shadow-2xl overflow-hidden transition-all">
+                  <div className="absolute top-full left-0 w-full z-20 bg-[#121212] border border-[#362b2b] rounded-b-lg overflow-hidden transition-all">
                     <div className="max-h-[400px] overflow-y-auto">
-                      {services.map((service, index) => (
-                        <button
-                          key={index}
-                          className={`w-full text-left p-6 ${index < services.length - 1 ? 'border-b border-[#362b2b]/50' : ''} ${selectedService.name === service.name ? 'bg-[#a12b2b]/10' : 'hover:bg-white/5'} flex justify-between items-center group transition-all`}
-                          onClick={() => handleServiceSelect(service)}
-                        >
-                          <div>
-                            <p className="text-white text-lg font-medium">{service.name}</p>
-                            <p className="text-[#b5a1a1] text-xs">{service.description}</p>
-                          </div>
-                          <p className="text-white font-bold">{service.price}</p>
-                        </button>
-                      ))}
+                      {orderableServices.map((service, index) => {
+                        const isSelected = orderItems.some(item => item.id === service.id);
+                        return (
+                          <button
+                            key={service.id}
+                            className={`w-full text-left p-6 ${index < orderableServices.length - 1 ? 'border-b border-[#362b2b]/50' : ''} ${isSelected ? 'bg-[#a12b2b]/10' : 'hover:bg-white/5'} flex justify-between items-center group transition-all`}
+                            onClick={() => handleServiceSelect(service)}
+                          >
+                            <div>
+                              <p className="text-white text-lg font-medium">{service.name}</p>
+                              <p className="text-[#b5a1a1] text-xs">{service.description}</p>
+                            </div>
+                            <p className="text-white font-bold">{formatPrice(service.price)}</p>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
               </div>
+              
+              {/* Order Items List - Show all items in bundle */}
+              {isBundle && (
+                <div className="mt-4 space-y-3">
+                  <p className="text-[#b5a1a1] text-xs font-bold tracking-[0.2em] uppercase mb-3">Bundle Items</p>
+                  <div className="bg-[#1a1a1a] border border-[#362b2b] rounded-lg overflow-hidden">
+                    {orderItems.map((item, index) => (
+                      <div
+                        key={item.id}
+                        className={`p-4 ${index < orderItems.length - 1 ? 'border-b border-[#362b2b]/50' : ''} flex justify-between items-center`}
+                      >
+                        <div>
+                          <p className="text-white text-sm font-medium">{item.name}</p>
+                          <p className="text-[#b5a1a1] text-xs">{item.description}</p>
+                        </div>
+                        <p className="text-white font-bold">{formatPrice(item.price)}</p>
+                      </div>
+                    ))}
+                    <div className="p-4 bg-[#121212] border-t border-[#362b2b] flex justify-between items-center">
+                      <p className="text-white text-sm font-bold uppercase tracking-[0.1em]">Total</p>
+                      <p className="text-[#a12b2b] text-xl font-bold">{formatPrice(totalPrice)}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </section>
 
             <section className="space-y-12">
               <h3 className="text-white text-xs font-bold tracking-[0.2em] uppercase border-b border-[#362b2b] pb-4">Personal Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
                 <div className="flex flex-col gap-2">
-                  <label className="text-[#b5a1a1] text-[10px] font-bold tracking-[0.15em] uppercase">Name</label>
+                  <label className="text-[#b5a1a1] text-[10px] font-bold tracking-[0.15em] uppercase">Name *</label>
                   <input
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
                     className="minimal-input w-full text-white placeholder:text-[#362b2b] py-2 bg-transparent border-t-0 border-l-0 border-r-0 border-b border-[#362b2b] rounded-none px-0 focus:outline-none focus:border-[#a12b2b] transition-colors"
                     placeholder="Johnathan Doe"
                     type="text"
+                    required
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-[#b5a1a1] text-[10px] font-bold tracking-[0.15em] uppercase">Email *</label>
+                  <input
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    className="minimal-input w-full text-white placeholder:text-[#362b2b] py-2 bg-transparent border-t-0 border-l-0 border-r-0 border-b border-[#362b2b] rounded-none px-0 focus:outline-none focus:border-[#a12b2b] transition-colors"
+                    placeholder="john@example.com"
+                    type="email"
+                    required
                   />
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-[#b5a1a1] text-[10px] font-bold tracking-[0.15em] uppercase">Vehicle Model</label>
                   <input
+                    value={vehicleModel}
+                    onChange={(e) => setVehicleModel(e.target.value)}
                     className="minimal-input w-full text-white placeholder:text-[#362b2b] py-2 bg-transparent border-t-0 border-l-0 border-r-0 border-b border-[#362b2b] rounded-none px-0 focus:outline-none focus:border-[#a12b2b] transition-colors"
                     placeholder="e.g. Porsche 911 (992)"
                     type="text"
@@ -234,8 +510,8 @@ function Checkout() {
                   <label className="text-[#b5a1a1] text-[10px] font-bold tracking-[0.15em] uppercase">Location</label>
                   <div className="flex items-center gap-2">
                     <input
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
                       className="minimal-input flex-1 text-white placeholder:text-[#362b2b] py-2 bg-transparent border-t-0 border-l-0 border-r-0 border-b border-[#362b2b] rounded-none px-0 focus:outline-none focus:border-[#a12b2b] transition-colors"
                       placeholder="Central London"
                       type="text"
@@ -243,27 +519,29 @@ function Checkout() {
                     <button
                       type="button"
                       onClick={handleGetLocation}
-                      disabled={locationLoading}
+                      disabled={addressLoading}
                       className="flex items-center justify-center gap-2 px-4 py-2 border border-[#362b2b] rounded-lg hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
                       title="Use my current location"
                     >
-                      {locationLoading ? (
+                      {addressLoading ? (
                         <div className="w-4 h-4 border-2 border-[#a12b2b] border-t-transparent rounded-full animate-spin"></div>
                       ) : (
                         <MdMyLocation className="text-[#a12b2b] group-hover:text-white transition-colors" />
                       )}
                       <span className="text-xs font-medium text-[#b5a1a1] group-hover:text-white transition-colors hidden sm:inline">
-                        {locationLoading ? 'Locating...' : 'Auto-fill'}
+                        {addressLoading ? 'Locating...' : 'Auto-fill'}
                       </span>
                     </button>
                   </div>
-                  {locationError && (
-                    <p className="text-[#a12b2b] text-xs mt-1">{locationError}</p>
+                  {addressError && (
+                    <p className="text-[#a12b2b] text-xs mt-1">{addressError}</p>
                   )}
                 </div>
                 <div className="flex flex-col gap-2">
                   <label className="text-[#b5a1a1] text-[10px] font-bold tracking-[0.15em] uppercase">Contact Number</label>
                   <input
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
                     className="minimal-input w-full text-white placeholder:text-[#362b2b] py-2 bg-transparent border-t-0 border-l-0 border-r-0 border-b border-[#362b2b] rounded-none px-0 focus:outline-none focus:border-[#a12b2b] transition-colors"
                     placeholder="+44 7000 000000"
                     type="tel"
@@ -273,34 +551,184 @@ function Checkout() {
             </section>
 
             <section className="space-y-8">
-              <div className="flex justify-between items-center border-b border-[#362b2b] pb-4">
-                <h3 className="text-white text-xs font-bold tracking-[0.2em] uppercase">Payment Method</h3>
-                <div className="flex items-center gap-2 text-[#b5a1a1]">
-                  <MdLock className="text-sm" />
-                  <span className="text-[10px] font-bold tracking-widest uppercase">Secure Encryption</span>
+              <div className="border-b border-[#362b2b] pb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <MdCalendarToday className="text-[#a12b2b]" />
+                  <h3 className="text-white text-xs font-bold tracking-[0.2em] uppercase">Schedule Appointment</h3>
                 </div>
+                <p className="text-[#b5a1a1] text-xs font-light leading-relaxed ml-8">
+                  Book your appointment now and pay on-site after service completion. No payment required upfront.
+                </p>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <button className="flex items-center justify-center gap-3 border border-[#362b2b] rounded-lg py-4 hover:bg-white/5 transition-all group">
-                  <MdContactless className="text-white group-hover:scale-110 transition-transform" />
-                  <span className="text-sm font-medium">Apple Pay</span>
-                </button>
-                <button className="flex items-center justify-center gap-3 border border-[#362b2b] rounded-lg py-4 hover:bg-white/5 transition-all group">
-                  <MdCreditCard className="text-white group-hover:scale-110 transition-transform" />
-                  <span className="text-sm font-medium">Credit Card</span>
-                </button>
+              
+              {/* Calendar */}
+              <div className="bg-[#1a1a1a] border border-[#362b2b] rounded-lg p-6">
+                {/* Month Navigation */}
+                <div className="flex items-center justify-between mb-6">
+                  <button
+                    onClick={handlePreviousMonth}
+                    className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+                    aria-label="Previous month"
+                  >
+                    <MdChevronLeft className="text-white text-xl" />
+                  </button>
+                  <h4 className="text-white text-lg font-medium">
+                    {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+                  </h4>
+                  <button
+                    onClick={handleNextMonth}
+                    className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+                    aria-label="Next month"
+                  >
+                    <MdChevronRight className="text-white text-xl" />
+                  </button>
+                </div>
+
+                {/* Calendar Grid */}
+                <div className="grid grid-cols-7 gap-2 mb-4">
+                  {/* Day headers */}
+                  {dayNames.map((day) => (
+                    <div key={day} className="text-center text-[#b5a1a1] text-xs font-bold py-2">
+                      {day}
+                    </div>
+                  ))}
+                  
+                  {/* Calendar days */}
+                  {getDaysInMonth(currentMonth).map((date, index) => {
+                    if (!date) {
+                      return <div key={`empty-${index}`} className="aspect-square" />;
+                    }
+                    
+                    const isPast = isPastDate(date);
+                    const isSelected = isSelectedDate(date);
+                    const isTodayDate = isToday(date);
+                    
+                    return (
+                      <button
+                        key={date.toISOString()}
+                        onClick={() => handleDateSelect(date)}
+                        disabled={isPast}
+                        className={`
+                          aspect-square rounded-lg text-sm font-medium transition-all
+                          ${isPast 
+                            ? 'text-[#362b2b] cursor-not-allowed opacity-30' 
+                            : isSelected
+                            ? 'bg-[#a12b2b] text-white'
+                            : isTodayDate
+                            ? 'border-2 border-[#a12b2b] text-white hover:bg-[#a12b2b]/20'
+                            : 'text-[#b5a1a1] hover:bg-white/5 hover:text-white'
+                          }
+                        `}
+                      >
+                        {date.getDate()}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Selected Date Display */}
+                {selectedDate && (
+                  <div className="mt-4 pt-4 border-t border-[#362b2b]">
+                    <p className="text-[#b5a1a1] text-xs font-bold tracking-[0.15em] uppercase mb-3">
+                      Selected Date
+                    </p>
+                    <p className="text-white text-sm font-medium mb-4">
+                      {formatDateDisplay(selectedDate)}
+                    </p>
+                    
+                    {/* Time Slots */}
+                    <div>
+                      <p className="text-[#b5a1a1] text-xs font-bold tracking-[0.15em] uppercase mb-3 flex items-center gap-2">
+                        <MdAccessTime className="text-sm" />
+                        Select Time
+                        {checkingAvailability && (
+                          <span className="text-xs text-[#b5a1a1] ml-2">(Checking availability...)</span>
+                        )}
+                      </p>
+                      {checkingAvailability ? (
+                        <div className="text-center py-4 text-[#b5a1a1] text-sm">Loading available times...</div>
+                      ) : (
+                        <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+                          {timeSlots.map((time) => {
+                            const isAvailable = availableTimeSlots.includes(time);
+                            const isSelected = selectedTime === time;
+                            
+                            return (
+                              <button
+                                key={time}
+                                onClick={() => isAvailable && setSelectedTime(time)}
+                                disabled={!isAvailable}
+                                className={`
+                                  py-2 px-3 rounded-lg text-sm font-medium transition-all
+                                  ${!isAvailable
+                                    ? 'bg-[#362b2b] text-[#362b2b] cursor-not-allowed opacity-30'
+                                    : isSelected
+                                    ? 'bg-[#a12b2b] text-white'
+                                    : 'bg-[#121212] border border-[#362b2b] text-[#b5a1a1] hover:border-[#a12b2b] hover:text-white'
+                                  }
+                                `}
+                                title={!isAvailable ? 'This time slot is not available' : ''}
+                              >
+                                {time}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {!selectedDate && (
+                  <p className="text-center text-[#b5a1a1] text-xs mt-4">
+                    Select a date to choose your preferred time
+                  </p>
+                )}
               </div>
             </section>
 
             <section className="pt-8 space-y-6">
-              <button className="w-full bg-[#a12b2b] hover:bg-[#a12b2b]/90 text-white py-5 rounded-lg text-sm font-bold tracking-[0.25em] uppercase transition-all shadow-lg shadow-[#a12b2b]/20 active:scale-[0.98]">
-                Confirm Order
-              </button>
-              <p className="text-center text-[#b5a1a1] text-[10px] font-light leading-relaxed">
-                By confirming this order, you agree to Rudy's Repair{' '}
-                <a className="underline hover:text-white transition-colors" href="#">Terms of Service</a> and{' '}
-                <a className="underline hover:text-white transition-colors" href="#">Privacy Policy</a>. Payment will be processed securely.
-              </p>
+              {submitSuccess ? (
+                <div className="bg-green-600/20 border border-green-600 rounded-lg p-6 text-center">
+                  <MdCheckCircle className="text-green-400 text-4xl mx-auto mb-4" />
+                  <h3 className="text-white text-lg font-bold mb-2">Appointment Confirmed!</h3>
+                  <p className="text-[#b5a1a1] text-sm mb-4">
+                    Your appointment has been scheduled for {formatDateDisplay(selectedDate)} at {selectedTime}
+                  </p>
+                  <p className="text-[#b5a1a1] text-xs">
+                    A confirmation email has been sent to {customerEmail}
+                  </p>
+                  <p className="text-[#b5a1a1] text-xs mt-4">
+                    Redirecting to home page...
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {submitError && (
+                    <div className="bg-red-600/20 border border-red-600 rounded-lg p-4 flex items-start gap-3">
+                      <MdError className="text-red-400 text-xl flex-shrink-0 mt-0.5" />
+                      <p className="text-red-400 text-sm">{submitError}</p>
+                    </div>
+                  )}
+                  <button 
+                    onClick={handleConfirmAppointment}
+                    disabled={!selectedDate || !selectedTime || !customerName || !customerEmail || submitting}
+                    className={`w-full py-5 rounded-lg text-sm font-bold tracking-[0.25em] uppercase transition-all ${
+                      selectedDate && selectedTime && customerName && customerEmail && !submitting
+                        ? 'bg-[#a12b2b] hover:bg-[#a12b2b]/90 text-white'
+                        : 'bg-[#362b2b] text-[#b5a1a1] cursor-not-allowed'
+                    }`}
+                  >
+                    {submitting ? 'Creating Appointment...' : selectedDate && selectedTime && customerName && customerEmail ? 'Confirm Appointment' : 'Fill All Fields & Select Date & Time'}
+                  </button>
+                  <p className="text-center text-[#b5a1a1] text-[10px] font-light leading-relaxed">
+                    By confirming this appointment, you agree to Rudy's Repair{' '}
+                    <a className="underline hover:text-white transition-colors" href="#">Terms of Service</a> and{' '}
+                    <a className="underline hover:text-white transition-colors" href="#">Privacy Policy</a>. 
+                    Payment will be collected on-site after service completion.
+                  </p>
+                </>
+              )}
             </section>
           </div>
         </main>

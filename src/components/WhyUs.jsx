@@ -2,55 +2,54 @@ import { MdVerified, MdHistoryEdu, MdCheckCircle } from 'react-icons/md';
 
 function WhyUs() {
   return (
-    <section className="py-20 bg-dark-matte" id="why-us">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-20 items-end mb-24">
-          <div>
-            <h2 className="font-display text-5xl md:text-6xl font-black uppercase tracking-tighter text-white mb-6">
-              Why <span className="text-primary">Us</span>
-            </h2>
-          </div>
+    <section className="pt-8 pb-16 bg-[#121212] border-b border-[#362b2b]/50" id="why-us">
+      <div className="max-w-[1200px] mx-auto px-6 md:px-20">
+        <div className="mb-16">
+          <p className="text-[#b5a1a1] text-xs font-bold tracking-[0.2em] uppercase mb-4">Why Choose Us</p>
+          <h2 className="text-white text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-12">
+            Why <span className="text-[#a12b2b]">Us</span>
+          </h2>
         </div>
-        <div className="grid md:grid-cols-2 gap-10">
-          <div className="glass-card p-10 group hover:border-primary/30 transition-all duration-500">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 border border-primary/20 bg-primary/5 flex items-center justify-center group-hover:bg-primary group-hover:scale-110 transition-all flex-shrink-0">
-                <MdVerified className="text-primary group-hover:text-white text-4xl" />
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="border border-[#362b2b] rounded-lg p-8 hover:bg-white/5 transition-all">
+            <div className="mb-6">
+              <div className="w-12 h-12 border border-[#362b2b] rounded-lg flex items-center justify-center mb-4">
+                <MdVerified className="text-[#a12b2b] text-2xl" />
               </div>
-              <h3 className="text-3xl font-black uppercase tracking-tight text-white">Free 25-point Inspection</h3>
+              <h3 className="text-white text-xl font-medium mb-4">Free 25-point Inspection</h3>
+              <p className="text-[#b5a1a1] text-sm leading-relaxed mb-6">
+                Every service comes with a comprehensive vehicle health check, to identify potential issues before they can become expensive problems.
+              </p>
             </div>
-            <p className="text-slate-400 text-lg leading-relaxed mb-8">
-              Every service comes with a comprehensive vehicle health check, to identify potential issues before they can become expensive problems.
-            </p>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 text-sm font-semibold text-slate-300">
-                <MdCheckCircle className="text-primary text-xl" />
-                BRAKE PAD INSPECTION
+            <div className="space-y-3 border-t border-[#362b2b] pt-6">
+              <div className="flex items-center gap-3 text-[#b5a1a1] text-xs font-bold tracking-[0.15em] uppercase">
+                <MdCheckCircle className="text-[#a12b2b] text-base" />
+                Brake Pad Inspection
               </div>
-              <div className="flex items-center gap-3 text-sm font-semibold text-slate-300">
-                <MdCheckCircle className="text-primary text-xl" />
-                FLUID LEVEL TOP-UPS
+              <div className="flex items-center gap-3 text-[#b5a1a1] text-xs font-bold tracking-[0.15em] uppercase">
+                <MdCheckCircle className="text-[#a12b2b] text-base" />
+                Fluid Level Top-ups
               </div>
             </div>
           </div>
-          <div className="glass-card p-10 group hover:border-primary/30 transition-all duration-500">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 border border-primary/20 bg-primary/5 flex items-center justify-center group-hover:bg-primary group-hover:scale-110 transition-all flex-shrink-0">
-                <MdHistoryEdu className="text-primary group-hover:text-white text-4xl" />
+          <div className="border border-[#362b2b] rounded-lg p-8 hover:bg-white/5 transition-all">
+            <div className="mb-6">
+              <div className="w-12 h-12 border border-[#362b2b] rounded-lg flex items-center justify-center mb-4">
+                <MdHistoryEdu className="text-[#a12b2b] text-2xl" />
               </div>
-              <h3 className="text-3xl font-black uppercase tracking-tight text-white">12-month Labour Guarantee</h3>
+              <h3 className="text-white text-xl font-medium mb-4">12-month Labour Guarantee</h3>
+              <p className="text-[#b5a1a1] text-sm leading-relaxed mb-6">
+                We stand by our craftsmanship. Enjoy peace of mind with our standard 12-month or 12,000-mile warranty on all labor.
+              </p>
             </div>
-            <p className="text-slate-400 text-lg leading-relaxed mb-8">
-              We stand by our craftsmanship. Enjoy peace of mind with our standard 12-month or 12,000-mile warranty on all labor.
-            </p>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 text-sm font-semibold text-slate-300">
-                <MdCheckCircle className="text-primary text-xl" />
-                CERTIFIED TECHNICIANS
+            <div className="space-y-3 border-t border-[#362b2b] pt-6">
+              <div className="flex items-center gap-3 text-[#b5a1a1] text-xs font-bold tracking-[0.15em] uppercase">
+                <MdCheckCircle className="text-[#a12b2b] text-base" />
+                Certified Technicians
               </div>
-              <div className="flex items-center gap-3 text-sm font-semibold text-slate-300">
-                <MdCheckCircle className="text-primary text-xl" />
-                NO-HASSLE CLAIMS
+              <div className="flex items-center gap-3 text-[#b5a1a1] text-xs font-bold tracking-[0.15em] uppercase">
+                <MdCheckCircle className="text-[#a12b2b] text-base" />
+                No-hassle Claims
               </div>
             </div>
           </div>

@@ -18,8 +18,11 @@ export default {
         "charcoal-interactive": "#1a1a1a",
       },
       fontFamily: {
-        display: ["Montserrat", "sans-serif"],
+        display: ["Space Grotesk", "sans-serif"],
         sans: ["Inter", "sans-serif"],
+      },
+      borderRadius: {
+        DEFAULT: "0px",
       },
     },
   },

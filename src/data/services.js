@@ -4,7 +4,8 @@ export const services = [
     id: 1,
     name: "Engine Oil & Filter Change",
     description: "Premium synthetic oil and new filter replacement",
-    price: 60,
+    price: 58,
+    originalPrice: 80,
     orderable: true
   },
   {
@@ -59,5 +60,6 @@ export const services = [
 ];
 
 export const formatPrice = (price) => {
-  return price === 0 ? 'FREE' : `£${price}`;
+  if (price === 0) return 'FREE';
+  return `£${Number(price).toFixed(2)}`;
 };

@@ -24,30 +24,38 @@ function FAQ() {
   ];
 
   return (
-    <section className="py-16 bg-[#121212] border-b border-[#362b2b]/50" id="faq">
+    <section className="py-24 bg-[#121212] border-b border-[#362b2b]/50" id="faq">
       <div className="max-w-[1200px] mx-auto px-6 md:px-20">
         <div className="mb-12 text-center">
-          <h2 className="text-white text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-12">FAQ</h2>
+          <h2 className="font-display text-white text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-12">FAQ</h2>
         </div>
         <div className="space-y-4 max-w-3xl mx-auto">
           {faqs.map((faq, index) => (
-            <div key={index} className="border border-[#362b2b] rounded-lg bg-[#1a1a1a] overflow-hidden">
+            <div key={index} className="bg-[#181818] overflow-hidden rounded-lg border border-[#362b2b]/30 hover:border-[#362b2b]/50 transition-all">
               <button
-                className="w-full flex justify-between items-center p-6 text-left hover:bg-white/5 transition-all"
+                className="w-full flex justify-between items-center p-6 text-left hover:bg-white/5 transition-all duration-200"
                 onClick={() => toggleFAQ(index)}
               >
                 <span className="text-white text-base font-medium">{faq.question}</span>
-                {openIndex === index ? (
-                  <MdExpandLess className="text-[#a12b2b] text-xl" />
-                ) : (
-                  <MdExpandMore className="text-[#a12b2b] text-xl" />
-                )}
+                <div className={`transition-transform duration-300 ${openIndex === index ? 'rotate-180' : ''}`}>
+                  {openIndex === index ? (
+                    <MdExpandLess className="text-[#a12b2b] text-xl" />
+                  ) : (
+                    <MdExpandMore className="text-[#a12b2b] text-xl" />
+                  )}
+                </div>
               </button>
-              {openIndex === index && (
+              <div 
+                className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                  openIndex === index 
+                    ? 'max-h-96 opacity-100' 
+                    : 'max-h-0 opacity-0'
+                }`}
+              >
                 <div className="px-6 pb-6 text-[#b5a1a1] text-sm border-t border-[#362b2b] leading-relaxed pt-4">
                   {faq.answer}
                 </div>
-              )}
+              </div>
             </div>
           ))}
         </div>

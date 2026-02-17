@@ -2,12 +2,12 @@ import { MdInfo, MdVerified } from 'react-icons/md';
 
 function PartsPolicy() {
   return (
-    <section className="py-16 bg-[#121212] border-b border-[#362b2b]/50">
+    <section className="py-24 bg-[#121212] border-b border-[#362b2b]/50">
       <div className="max-w-[1200px] mx-auto px-6 md:px-20">
         <div className="max-w-2xl mx-auto">
           <p className="text-[#b5a1a1] text-xs font-bold tracking-[0.2em] uppercase mb-4 text-center">Policy</p>
-          <h2 className="text-white text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-10 text-center">Parts Buying Policy</h2>
-          <div className="p-8 border border-[#362b2b] rounded-lg bg-[#1a1a1a] text-left">
+          <h2 className="font-display text-white text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-10 text-center">Parts Buying Policy</h2>
+          <div className="p-8 bg-[#181818] text-left">
             <p className="text-[#b5a1a1] text-sm leading-relaxed mb-8">
               You are encouraged to provide their own parts to ensure quality. We can also source parts for you if you prefer at an additional cost.
             </p>

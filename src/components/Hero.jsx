@@ -1,25 +1,41 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MdKeyboardArrowDown } from 'react-icons/md';
 
 function Hero() {
   const navigate = useNavigate();
+  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
 
   const handleOrder = () => {
     navigate('/checkout');
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 100) {
+        setShowScrollIndicator(false);
+      } else {
+        setShowScrollIndicator(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <section className="relative min-h-screen flex items-center pt-20 overflow-x-hidden bg-[#121212]">
+    <section className="relative min-h-screen flex items-center overflow-x-hidden bg-[#121212]">
       <div className="absolute inset-0 z-0 overflow-hidden">
         <img
-          alt="Mechanic working on car engine"
-          className="w-full h-full object-cover grayscale opacity-20"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZ8IaJXcuDUIIyYyZQHxAdSaJZRSwflV3n8cCSiHuAEoF3fBb0fkSMetOJGf70fHByYkvxegj607Pq0geeh7mj4T5BmeAoaja4FhzsRD4PwMf0Onqhv69DtE2hyVK9O7kISHBScQ7XzRuH3ykbh3N4qlIKEbztmMhmwOUvRIsuviP5V-fbsB2wl14g-WjzEeWccf57vkODQChiOoSuLy-osFMZI1P0eumqls5J13ig1vb0zmJKJ1UqRVQbsFFSaWjXmjw_vGA6y0sz"
+          alt="Happy customer with repaired car"
+          className="w-full h-full object-cover object-top opacity-60 hero-image-filter"
+          src="/example_1.png"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#121212]/60 to-[#121212]"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#121212]/40 to-[#121212]"></div>
       </div>
-      <div className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-20 py-24 w-full">
+      <div className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-20 py-24 w-full pt-32">
         <div className="max-w-2xl">
-          <h1 className="text-white text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight mb-6">
+          <h1 className="font-display text-white text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight mb-8">
             Need <span className="text-[#a12b2b]">repairs?</span>
           </h1>
           <p className="text-[#b5a1a1] text-lg md:text-xl font-light mb-12 leading-relaxed">
@@ -28,33 +44,54 @@ function Hero() {
             <span className="text-white">We come to you, wherever you are.</span>
           </p>
           <div className="flex flex-col sm:flex-row gap-6 items-start">
-            <button onClick={handleOrder} className="bg-[#a12b2b] hover:bg-[#a12b2b]/90 text-white px-8 py-4 rounded-lg text-sm font-bold tracking-[0.25em] uppercase transition-all">
+            <button
+              onClick={handleOrder}
+              className="bg-[#a12b2b] hover:bg-[#a12b2b]/90 text-white px-10 py-5 text-xs font-bold tracking-[0.25em] uppercase transition-all h-[60px] flex items-center justify-center"
+            >
               Order Now
             </button>
-            <div className="flex items-center gap-4 border border-[#362b2b] rounded-lg px-6 py-3">
-              <div className="flex -space-x-2">
-                <img
-                  alt="User portrait"
-                  className="w-10 h-10 rounded-full border-2 border-[#121212]"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQAdJkV3woYci-UqLuDcynljZjOnIIX8Tz4LaurKlP_WDrywVg1qmrN8EphrbtdwKEJZpF_pHd0HhlWdiBJUMc0pLrVfrIYWisjq37nvDCC0VQ1ZECZITcGy0E1sXaPkgWHYPje2u-QAkHTAp_XjD2z5rAJNiGQKaSODE3-UO9uCDG_yRxNUhcAQo0ktJf6MfxbYz-VEw4tQ04pIolnBde-HXGH9VWQDfVg7iQdjtR74FlU0-FyUjCjvVZel0zcxiiS3XId75Csr1O"
-                />
-                <img
-                  alt="User portrait"
-                  className="w-10 h-10 rounded-full border-2 border-[#121212]"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiZP5e3REPV623nUrSjSxEzoFVeK4cnV1JN_dbimf-afppQkdjLX4h3ZYO8QuFLN60DcGqYhy-fjnKiaKbvwWOeWbS084VEpcRlY-sZ7pbuoEQTbGkw-la3rqeukAiRD1FgpQG3auWol_pT8OhV62qq7RVybFVWytGqha8frWhUlSfWHPb2pYxZhtFHlcDImGzddk3W48H98GG8hdwNGsDTo7Y11Xve0VbvqePlu5nRBQ6UwtwIwJZaVwcHGcOez5iW-PCTcZTZuoq"
-                />
-                <img
-                  alt="User portrait"
-                  className="w-10 h-10 rounded-full border-2 border-[#121212]"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwZ3Y3l3AZOWxyrM0twCLua2ySb3au2VM78F02gQLp4wJ1D-vVv9XSqr5Ofkx1h1VydUaov17It7BdFRNn8sjojglK9NZSadvg2uUhi9s-slE5BmTbUHg7nurAQCrVA9UP9o6hSaZEBt9qh1_dA11Nz4z6rCC8OySkfkfpgaNt9m1GrIIX8G1Nw9PP1ilOMYYA61xJYCp3MfFCHkqR8JvsJtQC2MAg0mj263zf8PgsL-x798FUDfmj2cufWOR50Sf6g5JjvVmKGTDL"
-                />
+            <div className="flex items-center gap-4 bg-[#181818] px-6 py-5 h-[60px]">
+              <div className="flex -space-x-3">
+                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#121212] bg-[#121212]">
+                  <img
+                    alt="Happy customer 1"
+                    className="w-full h-full object-cover object-top"
+                    src="/customer1.png"
+                  />
+                </div>
+                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#121212] bg-[#121212]">
+                  <img
+                    alt="Happy customer 2"
+                    className="w-full h-full object-cover object-top transform -scale-x-100 opacity-70"
+                    src="/customer2.png"
+                  />
+                </div>
+                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#121212] bg-[#121212]">
+                  <img
+                    alt="Happy customer 3"
+                    className="w-full h-full object-cover object-top transform scale-125"
+                    src="/customer3.png"
+                  />
+                </div>
               </div>
               <div>
-                <p className="text-white text-base font-medium leading-tight">500+</p>
+                <p className="text-white text-base font-medium leading-tight">100+</p>
                 <p className="text-[#b5a1a1] text-[10px] font-bold tracking-[0.15em] uppercase">Happy Customers</p>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      
+      {/* Scroll Indicator */}
+      <div 
+        className={`absolute bottom-8 left-0 right-0 z-20 flex justify-center transition-opacity duration-500 ${
+          showScrollIndicator ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        <div className="flex flex-col items-center gap-2 animate-bounce">
+          <span className="text-[#b5a1a1] text-xs font-bold tracking-[0.2em] uppercase">Scroll</span>
+          <MdKeyboardArrowDown className="text-[#b5a1a1] text-2xl" />
         </div>
       </div>
     </section>

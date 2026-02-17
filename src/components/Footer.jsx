@@ -7,21 +7,21 @@ function Footer() {
         <div className="grid md:grid-cols-4 gap-12">
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-4 mb-8">
-              <div className="size-6 text-[#a12b2b]">
-                <svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                  <path clipRule="evenodd" d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z" fill="currentColor" fillRule="evenodd"></path>
-                </svg>
-              </div>
-              <span className="text-white text-xl font-bold leading-tight tracking-tight uppercase">Rudy's Repair</span>
+              <img 
+                src="/logo.png" 
+                alt="Rudy's Repair" 
+                className="h-12 md:h-16 w-auto"
+              />
+              <span className="text-white text-xl font-bold leading-tight tracking-tight uppercase" style={{ fontFamily: "'Poppins', sans-serif" }}>Rudy's Repair</span>
             </div>
             <p className="text-[#b5a1a1] max-w-sm mb-10 text-sm font-light leading-relaxed">
               Bringing the garage to your driveway. Professional, convenient, and reliable mechanic services for drivers in Oxfordshire who value their time.
             </p>
             <div className="flex gap-4">
-              <a className="w-10 h-10 border border-[#362b2b] rounded-lg flex items-center justify-center hover:bg-white/5 hover:border-[#a12b2b] transition-all" href="#">
+              <a className="w-10 h-10 flex items-center justify-center hover:bg-[#181818] transition-all" href="#">
                 <MdShare className="text-lg text-[#b5a1a1] hover:text-white" />
               </a>
-              <a className="w-10 h-10 border border-[#362b2b] rounded-lg flex items-center justify-center hover:bg-white/5 hover:border-[#a12b2b] transition-all" href="#">
+              <a className="w-10 h-10 flex items-center justify-center hover:bg-[#181818] transition-all" href="#">
                 <MdAlternateEmail className="text-lg text-[#b5a1a1] hover:text-white" />
               </a>
             </div>
@@ -39,13 +39,13 @@ function Footer() {
             <h4 className="font-bold uppercase mb-6 tracking-[0.15em] text-xs text-[#b5a1a1]">Contact</h4>
             <ul className="space-y-4 text-[#b5a1a1] text-sm">
               <li className="flex items-center gap-3">
-                <MdPhone className="text-[#a12b2b] text-lg" /> 1-800-RUDY-FIX
+                <MdPhone className="text-[#a12b2b] text-lg" /> 77474-848890
               </li>
               <li className="flex items-center gap-3">
-                <MdMail className="text-[#a12b2b] text-lg" /> hello@rudysrepair.com
+                <MdMail className="text-[#a12b2b] text-lg" /> alex.rudnitskyi@abingdon.org.uk
               </li>
               <li className="flex items-center gap-3">
-                <MdLocationOn className="text-[#a12b2b] text-lg" /> Mobile Service HQ
+                <MdLocationOn className="text-[#a12b2b] text-lg" /> Abingdon, Oxfordshire
               </li>
             </ul>
           </div>

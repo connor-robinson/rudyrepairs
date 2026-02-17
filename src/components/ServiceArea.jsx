@@ -373,11 +373,11 @@ function ServiceArea() {
   const hasApiKey = GOOGLE_MAPS_API_KEY && GOOGLE_MAPS_API_KEY !== '';
 
   return (
-    <section className="py-16 bg-[#121212] border-b border-[#362b2b]/50" id="location">
+    <section className="py-24 bg-[#121212] border-b border-[#362b2b]/50" id="location">
       <div className="max-w-[1200px] mx-auto px-6 md:px-20">
         <div className="mb-12">
           <p className="text-[#b5a1a1] text-xs font-bold tracking-[0.2em] uppercase mb-4">Service Area</p>
-          <h2 className="text-white text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-6">
+          <h2 className="font-display text-white text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-6">
             Our <span className="text-[#a12b2b]">Location</span>
           </h2>
           <p className="text-[#b5a1a1] text-sm font-light max-w-2xl">
@@ -385,7 +385,7 @@ function ServiceArea() {
           </p>
         </div>
 
-        <div className="border border-[#362b2b] rounded-lg overflow-hidden mb-8">
+        <div className="bg-[#181818] overflow-hidden mb-8">
           {!hasApiKey ? (
             <div className="h-[500px] flex items-center justify-center bg-[#1a1a1a]">
               <div className="text-center px-6">
@@ -488,7 +488,7 @@ function ServiceArea() {
           )}
         </div>
 
-        <div className="border border-[#362b2b] rounded-lg p-8 md:p-12 bg-[#1a1a1a]">
+        <div className="bg-[#181818] p-8 md:p-12">
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="flex-1 relative">
               {hasApiKey && window.google?.maps?.places ? (
@@ -524,7 +524,7 @@ function ServiceArea() {
                 type="button"
                 onClick={handleGetLocation}
                 disabled={locationLoading}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-10 h-10 border border-[#362b2b] hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded-lg z-10"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-10 h-10 bg-[#181818] hover:bg-[#1f1f1f] transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded-lg z-10"
                 title="Use my current location"
               >
                 {locationLoading ? (

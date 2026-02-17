@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rudy's Repair | Mobile Mechanic Oxfordshire</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#EF4444",
+                        "background-light": "#F9FAFB",
+                        "background-dark": "#0A0A0A",
+                    },
+                    fontFamily: {
+                        display: ["Space Grotesk", "sans-serif"],
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0px",
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        .brutalist-border {
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .service-card:hover {
+            border-color: #EF4444;
+            transform: translateY(-2px);
+        }
+        .map-container {
+            filter: grayscale(1) invert(1) contrast(1.2);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A0A0A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #EF4444;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans selection:bg-primary selection:text-white">
+<nav class="fixed top-0 w-full z-50 border-b border-black/5 dark:border-white/10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary flex items-center justify-center">
+<span class="material-icons-outlined text-white text-sm">settings_suggest</span>
+</div>
+<span class="font-display font-bold text-xl tracking-tight">RUDY'S REPAIR</span>
+</div>
+<div class="hidden md:flex items-center gap-8 text-sm font-medium uppercase tracking-widest">
+<a class="hover:text-primary transition-colors" href="#why">Why Us</a>
+<a class="hover:text-primary transition-colors" href="#pricing">Pricing</a>
+<a class="hover:text-primary transition-colors" href="#reviews">Reviews</a>
+<a class="hover:text-primary transition-colors" href="#faq">FAQ</a>
+</div>
+<a class="bg-primary hover:bg-red-600 text-white px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all" href="#order">
+                Order Now
+            </a>
+</div>
+</nav>
+<section class="relative min-h-screen flex items-center pt-20 overflow-hidden">
+<div class="absolute inset-0 z-0 opacity-20 dark:opacity-40">
+<img alt="Mechanic working on car" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5ArDfL41BZFaK5qqUcJB7LftMpcTKYwfFKKTY15OXYjvDV5f60pJY6eT418gkHRtB5WffTXzI2114RRAawsEjiNMn-BhuBj24llceNK3KShbkXNPHHjC2lcWkdECucWOIUxeyXQtXhnEjOu12eL_CTJwVjJHu87fSIRJnIVJGJW_P9vUchFABenN9RGsU_rFsa273wsEdZxZDAoOIQ8AR8abryIVHUhcxPxVB3dSdML3WkfSd_tNPoU9ZBfp1zKBkb9ikCM71CQ0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background-light dark:from-background-dark via-transparent to-background-light dark:to-background-dark"></div>
+</div>
+<div class="max-w-7xl mx-auto px-6 relative z-10 w-full">
+<div class="max-w-3xl">
+<h1 class="font-display text-6xl md:text-8xl font-bold leading-none mb-8">
+                    Need <span class="text-primary italic">repairs?</span>
+</h1>
+<p class="text-xl md:text-2xl text-slate-600 dark:text-slate-400 mb-12 max-w-xl font-light leading-relaxed">
+                    Effortless tyre and oil change in Oxfordshire. We come to you, wherever you are.
+                </p>
+<div class="flex flex-col sm:flex-row items-center gap-8">
+<button class="w-full sm:w-auto bg-primary hover:bg-red-600 text-white px-10 py-5 text-sm font-bold uppercase tracking-[0.2em] transition-all">
+                        Order Now
+                    </button>
+<div class="flex items-center gap-4">
+<div class="flex -space-x-3">
+<img alt="Customer" class="w-10 h-10 rounded-full border-2 border-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDalyoENqlrW78z2wUTqMgftlNenRWIENVfwEG2JY6ptexEGHFyPbSPa7AQKrWS0wNX8kJAJTMZx8EsmpTgW5GNZ76x4wxp217tAN3qKhrqIrJcf7FdA7z-tjm71uwdby503Bb7CnxIVncLpZAKFXqc8VYjO947rhlVHcYqE63Lngdnl2sn5fREcFDL-QwtyXnByDB2qCOWNNZAEGezRnzVHmM7M9ORJ0QyRbngisPO5E_6b6ln1acx3pLN3jnicP4qfXOi32FneEA"/>
+<img alt="Customer" class="w-10 h-10 rounded-full border-2 border-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPabJyyOjvGjXDVJHYcQk7oCmvCwLzM6PbbAQ_sd8dU8iRooiOr1TYSMt7pEVQ2TmPP3dtUi2PdcdsrdYOQ8sU2wTPJtND8tRUFy3UqdAHnzA0toFRfBsb2_94ZU2kknyr--QKdXQ8Nlmb6P9DzQREaSkylhlyzSvcIcI8XH-4F-YNaWfASm_V7t3WsI5Nm1i0um5AUboiUjVUohQHj-Pf1A6aAwAdiw8BM9XbWL-hDSvB8CztmitLGq0rkmBSZAJZsa5V8rsCqdc"/>
+<img alt="Customer" class="w-10 h-10 rounded-full border-2 border-background-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqM25bBtzqweLkmpjheJOQDMLRI29LkrJJ40ZpBQspHXJ0mM1gJLNjnjVMKb9wErbJF50Mwjk-OcYhwFzEuwwRRrwZJMDB1VEHS-OyyFY8VcvoBupKM1GkmihFuM6R8e12hkyXtdFlZFxNiifl0-r77x4xfXOlfhpgjspdJ2bQgbLMzSi-BOgvoxpIFc7hwmVgpoN_2e4ZhWe-bDXhlP2HeHAZL8mpGLXSrA9LfyK4CQJvLLm-JiSNCYOTwbAm8op3_FfgCWQxEy8"/>
+</div>
+<div class="text-xs uppercase tracking-widest font-bold">
+<span class="text-primary">500+</span>
+<span class="block text-slate-500">Happy Customers</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-32 border-y border-black/5 dark:border-white/5" id="why">
+<div class="max-w-7xl mx-auto px-6">
+<div class="mb-20">
+<p class="text-xs font-bold uppercase tracking-[0.3em] text-primary mb-4">Why Choose Us</p>
+<h2 class="font-display text-5xl font-bold">Why <span class="text-primary">Us</span></h2>
+</div>
+<div class="grid md:grid-cols-2 gap-px bg-black/5 dark:bg-white/5">
+<div class="bg-background-light dark:bg-background-dark p-12 hover:bg-slate-50 dark:hover:bg-zinc-900/50 transition-colors">
+<span class="material-icons-outlined text-primary text-4xl mb-8">verified</span>
+<h3 class="font-display text-2xl font-bold mb-4">Free 25-point Inspection</h3>
+<p class="text-slate-500 dark:text-slate-400 leading-relaxed mb-8">Every service comes with a comprehensive vehicle health check, to identify potential issues before they can become expensive problems.</p>
+<ul class="space-y-3 text-sm font-medium uppercase tracking-wider">
+<li class="flex items-center gap-3"><span class="w-1.5 h-1.5 bg-primary"></span> Brake Pad Inspection</li>
+<li class="flex items-center gap-3"><span class="w-1.5 h-1.5 bg-primary"></span> Fluid Level Top-ups</li>
+</ul>
+</div>
+<div class="bg-background-light dark:bg-background-dark p-12 hover:bg-slate-50 dark:hover:bg-zinc-900/50 transition-colors">
+<span class="material-icons-outlined text-primary text-4xl mb-8">workspace_premium</span>
+<h3 class="font-display text-2xl font-bold mb-4">12-month Labour Guarantee</h3>
+<p class="text-slate-500 dark:text-slate-400 leading-relaxed mb-8">We stand by our craftsmanship. Enjoy peace of mind with our standard 12-month or 12,000-mile warranty on all labor.</p>
+<ul class="space-y-3 text-sm font-medium uppercase tracking-wider">
+<li class="flex items-center gap-3"><span class="w-1.5 h-1.5 bg-primary"></span> Certified Technicians</li>
+<li class="flex items-center gap-3"><span class="w-1.5 h-1.5 bg-primary"></span> No-Hassle Claims</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section class="py-32" id="pricing">
+<div class="max-w-7xl mx-auto px-6">
+<div class="mb-20">
+<p class="text-xs font-bold uppercase tracking-[0.3em] text-primary mb-4">Pricing</p>
+<h2 class="font-display text-5xl font-bold mb-4">Transparent <span class="text-primary">Pricing</span></h2>
+<p class="text-slate-500 dark:text-slate-400">No hidden fees, no surprises.</p>
+</div>
+<div class="space-y-4">
+<div class="service-card group border border-black/5 dark:border-white/5 p-8 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-8">
+<div class="flex-1">
+<h4 class="font-display text-xl font-bold mb-2">Engine Oil &amp; Filter Change</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400">Premium synthetic oil and new filter replacement</p>
+</div>
+<div class="flex items-center gap-12">
+<div class="font-display text-3xl font-bold">£60</div>
+<button class="bg-black dark:bg-white text-white dark:text-black group-hover:bg-primary group-hover:text-white px-8 py-3 text-xs font-bold uppercase tracking-widest transition-all">
+                            Order →
+                        </button>
+</div>
+</div>
+<div class="service-card group border border-black/5 dark:border-white/5 p-8 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-8">
+<div class="flex-1">
+<h4 class="font-display text-xl font-bold mb-2">Brake Fluid Flush &amp; Bleed</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400">Complete brake fluid system flush and bleed</p>
+</div>
+<div class="flex items-center gap-12">
+<div class="font-display text-3xl font-bold">£65</div>
+<button class="bg-black dark:bg-white text-white dark:text-black group-hover:bg-primary group-hover:text-white px-8 py-3 text-xs font-bold uppercase tracking-widest transition-all">
+                            Order →
+                        </button>
+</div>
+</div>
+<div class="service-card group border border-black/5 dark:border-white/5 p-8 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-8">
+<div class="flex-1">
+<h4 class="font-display text-xl font-bold mb-2">Coolant System Flush</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400">Full cooling system flush and refill</p>
+</div>
+<div class="flex items-center gap-12">
+<div class="font-display text-3xl font-bold">£70</div>
+<button class="bg-black dark:bg-white text-white dark:text-black group-hover:bg-primary group-hover:text-white px-8 py-3 text-xs font-bold uppercase tracking-widest transition-all">
+                            Order →
+                        </button>
+</div>
+</div>
+<div class="service-card group border border-black/5 dark:border-white/5 p-8 transition-all duration-300 flex flex-col md:flex-row md:items-center justify-between gap-8">
+<div class="flex-1">
+<h4 class="font-display text-xl font-bold mb-2">Brake and Rotor Fitting</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400">Brake pad and rotor replacement for front or rear axle</p>
+</div>
+<div class="flex items-center gap-12">
+<div class="font-display text-3xl font-bold text-primary">£110</div>
+<button class="bg-black dark:bg-white text-white dark:text-black group-hover:bg-primary group-hover:text-white px-8 py-3 text-xs font-bold uppercase tracking-widest transition-all">
+                            Order →
+                        </button>
+</div>
+</div>
+<div class="p-8 border-t-2 border-dashed border-black/10 dark:border-white/10 flex justify-between items-center text-slate-500">
+<span class="text-sm uppercase tracking-widest font-bold">Windshield Washer Top-up</span>
+<span class="font-display font-bold text-primary">FREE</span>
+</div>
+</div>
+</div>
+</section>
+<section class="py-32 bg-slate-50 dark:bg-zinc-900/30">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid lg:grid-cols-2 gap-20 items-center">
+<div>
+<p class="text-xs font-bold uppercase tracking-[0.3em] text-primary mb-4">Service Area</p>
+<h2 class="font-display text-5xl font-bold mb-8">Our <span class="text-primary">Location</span></h2>
+<p class="text-slate-500 dark:text-slate-400 mb-12 leading-relaxed max-w-md">
+                        We service customers within a 20-mile radius of Abingdon, Oxfordshire. Explore the map to see our coverage area, or enter your address below to check.
+                    </p>
+<div class="space-y-6">
+<div class="relative">
+<input class="w-full bg-white dark:bg-zinc-950 border-black/10 dark:border-white/10 py-5 px-6 pr-20 focus:ring-primary focus:border-primary text-sm tracking-wide transition-all" placeholder="Enter your address..." type="text"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-primary font-bold text-xs uppercase tracking-widest hover:text-red-400">Check</button>
+</div>
+<div class="flex items-center gap-6 text-xs font-bold uppercase tracking-widest text-slate-400">
+<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-primary/40 ring-4 ring-primary/10"></span> 20-mile radius</span>
+<span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-primary"></span> Service Center</span>
+</div>
+</div>
+</div>
+<div class="relative aspect-square border border-black/10 dark:border-white/10 overflow-hidden bg-zinc-800">
+<div class="absolute inset-0 map-container opacity-50">
+<img alt="Map Background" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfDJxiGsWZ4P4F67zW_qZiHERxivmqAJBkxt4fylicDauN5cILOK8JWbrdl9fdZHf9Pw0CpZzu1H8TRcS8IfA51BJsq0jxbUjBfYGHVF7HVRGPMU7Q2rsOOHy68BzxuCNJRekicpptf-8MAMmBiUj9Myk6fxbxjc2U66VBfbj3h71tI8t-r5FIPSli_0g0_uHOCJb9V8Pbq-oMmaD4ApNY3cwauwchuU1yafGqpVobDadLylCgGVcELclnyHDZHtGQGiXPGehN2g0"/>
+</div>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-48 h-48 rounded-full border-2 border-primary/50 bg-primary/5 flex items-center justify-center animate-pulse">
+<span class="material-icons-outlined text-primary text-4xl">location_on</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-32" id="reviews">
+<div class="max-w-7xl mx-auto px-6 text-center">
+<div class="mb-20">
+<p class="text-xs font-bold uppercase tracking-[0.3em] text-primary mb-4">Reviews</p>
+<h2 class="font-display text-5xl font-bold mb-12">Our <span class="text-primary">Reviews</span></h2>
+<div class="flex justify-center gap-16">
+<div>
+<div class="font-display text-4xl font-bold">100+</div>
+<div class="text-[10px] uppercase tracking-[0.3em] font-bold text-slate-500 mt-2">Orders</div>
+</div>
+<div>
+<div class="font-display text-4xl font-bold">4.9</div>
+<div class="flex gap-1 justify-center mt-2 text-primary">
+<span class="material-icons-outlined text-[14px]">star</span>
+<span class="material-icons-outlined text-[14px]">star</span>
+<span class="material-icons-outlined text-[14px]">star</span>
+<span class="material-icons-outlined text-[14px]">star</span>
+<span class="material-icons-outlined text-[14px]">star</span>
+</div>
+</div>
+</div>
+</div>
+<div class="grid md:grid-cols-2 gap-8 text-left">
+<div class="p-12 border border-black/5 dark:border-white/5 relative group hover:border-primary transition-colors">
+<span class="material-icons-outlined absolute top-12 right-12 text-6xl opacity-5 dark:opacity-10">format_quote</span>
+<div class="flex gap-1 mb-6 text-primary">
+<span class="material-icons-outlined text-sm">star</span>
+<span class="material-icons-outlined text-sm">star</span>
+<span class="material-icons-outlined text-sm">star</span>
+<span class="material-icons-outlined text-sm">star</span>
+<span class="material-icons-outlined text-sm">star</span>
+</div>
+<h4 class="font-display text-xl font-bold mb-4">"Outstanding Service"</h4>
+<p class="text-slate-500 dark:text-slate-400 mb-8 italic leading-relaxed">
+                        "Saved me so much time. Rudy arrived right on schedule and had my brakes sorted in under an hour. Truly professional and the price was exactly as quoted."
+                    </p>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-slate-200 dark:bg-zinc-800 flex items-center justify-center font-bold">JS</div>
+<div>
+<div class="text-sm font-bold uppercase tracking-widest">James Sterling</div>
+<div class="text-[10px] uppercase text-slate-500 font-bold">Abingdon, Oxfordshire</div>
+</div>
+</div>
+</div>
+<div class="p-12 border border-black/5 dark:border-white/5 relative group hover:border-primary transition-colors">
+<span class="material-icons-outlined absolute top-12 right-12 text-6xl opacity-5 dark:opacity-10">format_quote</span>
+<div class="flex gap-1 mb-6 text-primary">
+<span class="material-icons-outlined text-sm">star</span>
+<span class="material-icons-outlined text-sm">star</span>
+<span class="material-icons-outlined text-sm">star</span>
+<span class="material-icons-outlined text-sm">star</span>
+<span class="material-icons-outlined text-sm">star</span>
+</div>
+<h4 class="font-display text-xl font-bold mb-4">"Incredibly Convenient"</h4>
+<p class="text-slate-500 dark:text-slate-400 mb-8 italic leading-relaxed">
+                        "No more waiting at the garage for hours. I was able to work from home while my car got a full oil change and health check. Highly recommend to everyone."
+                    </p>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-slate-200 dark:bg-zinc-800 flex items-center justify-center font-bold">CH</div>
+<div>
+<div class="text-sm font-bold uppercase tracking-widest">Claire Hughes</div>
+<div class="text-[10px] uppercase text-slate-500 font-bold">Witney, Oxfordshire</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-32 border-t border-black/5 dark:border-white/5" id="faq">
+<div class="max-w-3xl mx-auto px-6">
+<h2 class="font-display text-4xl font-bold mb-16 text-center">FAQ</h2>
+<div class="space-y-4">
+<details class="group border border-black/5 dark:border-white/5 overflow-hidden">
+<summary class="flex items-center justify-between p-6 cursor-pointer hover:bg-slate-50 dark:hover:bg-zinc-900/50 transition-colors">
+<span class="font-medium uppercase tracking-wider text-sm">What areas do you cover?</span>
+<span class="material-icons-outlined group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="px-6 pb-6 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                        We primarily serve Abingdon and the surrounding 20-mile radius, including Oxford, Didcot, Witney, and Wallingford. If you're unsure if you're in our range, please use our coverage checker above.
+                    </div>
+</details>
+<details class="group border border-black/5 dark:border-white/5 overflow-hidden">
+<summary class="flex items-center justify-between p-6 cursor-pointer hover:bg-slate-50 dark:hover:bg-zinc-900/50 transition-colors">
+<span class="font-medium uppercase tracking-wider text-sm">Do I need to be present?</span>
+<span class="material-icons-outlined group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="px-6 pb-6 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                        Yes, someone needs to be present to hand over the keys and sign the service report. However, you don't need to stay with the vehicle while we work.
+                    </div>
+</details>
+<details class="group border border-black/5 dark:border-white/5 overflow-hidden">
+<summary class="flex items-center justify-between p-6 cursor-pointer hover:bg-slate-50 dark:hover:bg-zinc-900/50 transition-colors">
+<span class="font-medium uppercase tracking-wider text-sm">What happens if I need to cancel?</span>
+<span class="material-icons-outlined group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="px-6 pb-6 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                        We offer free cancellation up to 24 hours before your scheduled appointment. Cancellations made within 24 hours may be subject to a small call-out fee.
+                    </div>
+</details>
+</div>
+</div>
+</section>
+<footer class="bg-slate-50 dark:bg-zinc-950 border-t border-black/5 dark:border-white/5 py-24">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid md:grid-cols-4 gap-12 mb-20">
+<div class="md:col-span-2">
+<div class="flex items-center gap-2 mb-8">
+<div class="w-8 h-8 bg-primary flex items-center justify-center">
+<span class="material-icons-outlined text-white text-sm">settings_suggest</span>
+</div>
+<span class="font-display font-bold text-xl tracking-tight uppercase">Rudy's Repair</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed mb-8">
+                        Bringing the garage to your driveway. Professional, convenient, and reliable mechanic services for drivers in Oxfordshire who value their time.
+                    </p>
+<div class="flex gap-4">
+<a class="w-10 h-10 flex items-center justify-center border border-black/10 dark:border-white/10 hover:border-primary hover:text-primary transition-all" href="#">
+<span class="material-icons-outlined text-sm">share</span>
+</a>
+<a class="w-10 h-10 flex items-center justify-center border border-black/10 dark:border-white/10 hover:border-primary hover:text-primary transition-all" href="#">
+<span class="material-icons-outlined text-sm">public</span>
+</a>
+</div>
+</div>
+<div>
+<h5 class="text-[10px] font-bold uppercase tracking-[0.3em] mb-8 text-primary">Services</h5>
+<ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400 font-medium uppercase tracking-widest">
+<li><a class="hover:text-primary transition-colors" href="#">Oil Changes</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Tyre Service</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Brake Repair</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Diagnostics</a></li>
+</ul>
+</div>
+<div>
+<h5 class="text-[10px] font-bold uppercase tracking-[0.3em] mb-8 text-primary">Contact</h5>
+<ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+<li class="flex items-center gap-3"><span class="material-icons-outlined text-primary text-sm">call</span> 1-800-RUDY-FIX</li>
+<li class="flex items-center gap-3"><span class="material-icons-outlined text-primary text-sm">mail</span> hello@rudysrepair.com</li>
+<li class="flex items-center gap-3"><span class="material-icons-outlined text-primary text-sm">location_on</span> Mobile Service HQ</li>
+</ul>
+</div>
+</div>
+<div class="pt-12 border-t border-black/5 dark:border-white/5 flex flex-col md:row items-center justify-between gap-6">
+<p class="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">
+                    © 2024 Rudy's Repair Mobile Mechanic
+                </p>
+<div class="flex gap-8 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+</div>
+</div>
+</div>
+</footer>
+
+</body></html>

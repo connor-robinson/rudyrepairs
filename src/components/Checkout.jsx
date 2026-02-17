@@ -88,11 +88,29 @@ function Checkout() {
     const src = 'https://assets.calendly.com/assets/external/widget.js';
     const existingScript = document.querySelector(`script[src="${src}"]`);
 
+    const initializeCalendly = () => {
+      // Give Calendly a moment to process the widget
+      setTimeout(() => {
+        if (window.Calendly) {
+          setCalendlyReady(true);
+        } else {
+          // If Calendly still isn't available, try again
+          setTimeout(() => {
+            if (window.Calendly) {
+              setCalendlyReady(true);
+            } else {
+              setCalendlyError('Unable to initialize the scheduling calendar. Please refresh the page and try again.');
+            }
+          }, 1000);
+        }
+      }, 100);
+    };
+
     if (existingScript) {
       if (existingScript.getAttribute('data-loaded') === 'true') {
-        setCalendlyReady(true);
+        initializeCalendly();
       } else {
-        existingScript.addEventListener('load', () => setCalendlyReady(true));
+        existingScript.addEventListener('load', initializeCalendly);
       }
       return;
     }
@@ -102,7 +120,7 @@ function Checkout() {
     script.async = true;
     script.onload = () => {
       script.setAttribute('data-loaded', 'true');
-      setCalendlyReady(true);
+      initializeCalendly();
     };
     script.onerror = () => {
       setCalendlyError('Unable to load the scheduling calendar. Please refresh the page and try again.');
@@ -199,7 +217,7 @@ function Checkout() {
                               <div className={`w-5 h-5 rounded-sm flex items-center justify-center transition-all ${
                                 isSelected
                                   ? 'bg-[#a12b2b] text-white'
-                                  : 'bg-[#2a2a2a] text-[#5a5a5a] border border-[#362b2b]'
+                                  : 'bg-[#2a2a2a] text-[#5a5a5a]'
                               }`}>
                                 {isSelected && <span className="text-xs">✓</span>}
                               </div>
@@ -310,20 +328,18 @@ function Checkout() {
               </div>
 
               <div className="bg-[#1a1a1a] border border-[#362b2b] rounded-lg p-6">
-                <div className="relative min-h-[220px]">
+                <div className="relative min-h-[700px]">
                   {!calendlyReady && !calendlyError && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10">
                       <div className="w-8 h-8 border-2 border-[#a12b2b] border-t-transparent rounded-full animate-spin" />
                       <p className="text-[#b5a1a1] text-xs">Loading calendar…</p>
                     </div>
                   )}
-                  {calendlyReady && (
-                    <div
-                      className="calendly-inline-widget"
-                      data-url={calendlyUrl}
-                      style={{ minWidth: '320px', height: '700px' }}
-                    />
-                  )}
+                  <div
+                    className="calendly-inline-widget"
+                    data-url={calendlyUrl}
+                    style={{ minWidth: '320px', height: '700px', display: calendlyReady ? 'block' : 'none' }}
+                  />
                 </div>
                 {calendlyError && (
                   <p className="text-red-400 text-xs mt-3 text-center">

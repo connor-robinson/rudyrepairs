@@ -8,8 +8,10 @@ function Checkout() {
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const calendlySectionRef = useRef(null);
   const [calendlyReady, setCalendlyReady] = useState(false);
   const [calendlyError, setCalendlyError] = useState('');
+  const [shouldLoadCalendly, setShouldLoadCalendly] = useState(false);
   
   // Get order data from location state, or default to empty
   const orderData = location.state || null;
@@ -83,27 +85,61 @@ function Checkout() {
     };
   }, [dropdownOpen]);
 
-  // Load Calendly widget script once
+  // Intersection Observer to lazy load Calendly when section is visible
   useEffect(() => {
+    if (!calendlySectionRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !shouldLoadCalendly) {
+            setShouldLoadCalendly(true);
+            observer.disconnect();
+          }
+        });
+      },
+      {
+        rootMargin: '200px', // Start loading 200px before section is visible
+        threshold: 0.1
+      }
+    );
+
+    observer.observe(calendlySectionRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [shouldLoadCalendly]);
+
+  // Load Calendly widget script once - optimized for faster loading
+  useEffect(() => {
+    if (!shouldLoadCalendly) return;
+
     const src = 'https://assets.calendly.com/assets/external/widget.js';
     const existingScript = document.querySelector(`script[src="${src}"]`);
 
     const initializeCalendly = () => {
-      // Give Calendly a moment to process the widget
-      setTimeout(() => {
+      // Check immediately, then with minimal delay if needed
+      if (window.Calendly) {
+        setCalendlyReady(true);
+        return;
+      }
+      
+      // Small delay to allow script to initialize
+      const checkInterval = setInterval(() => {
         if (window.Calendly) {
+          clearInterval(checkInterval);
           setCalendlyReady(true);
-        } else {
-          // If Calendly still isn't available, try again
-          setTimeout(() => {
-            if (window.Calendly) {
-              setCalendlyReady(true);
-            } else {
-              setCalendlyError('Unable to initialize the scheduling calendar. Please refresh the page and try again.');
-            }
-          }, 1000);
         }
-      }, 100);
+      }, 50);
+      
+      // Timeout after 3 seconds
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        if (!window.Calendly) {
+          setCalendlyError('Unable to initialize the scheduling calendar. Please refresh the page and try again.');
+        }
+      }, 3000);
     };
 
     if (existingScript) {
@@ -115,9 +151,12 @@ function Checkout() {
       return;
     }
 
+    // Create and load script with optimizations
     const script = document.createElement('script');
     script.src = src;
     script.async = true;
+    script.defer = false; // Don't defer, load immediately
+    script.crossOrigin = 'anonymous';
     script.onload = () => {
       script.setAttribute('data-loaded', 'true');
       initializeCalendly();
@@ -125,8 +164,10 @@ function Checkout() {
     script.onerror = () => {
       setCalendlyError('Unable to load the scheduling calendar. Please refresh the page and try again.');
     };
-    document.body.appendChild(script);
-  }, []);
+    
+    // Append to head for faster loading (better than body)
+    document.head.appendChild(script);
+  }, [shouldLoadCalendly]);
 
   // Calendly inline embed URL with pre-filled details
   const calendlyBaseUrl = 'https://calendly.com/ansonchanw/bookrepair';
@@ -319,7 +360,7 @@ function Checkout() {
               )}
             </section>
 
-            <section className="space-y-6">
+            <section className="space-y-6" ref={calendlySectionRef}>
               <div>
                 <h2 className="text-white text-2xl md:text-3xl font-bold mb-2">Book Your Appointment</h2>
                 <p className="text-[#b5a1a1] text-sm">

@@ -10,7 +10,7 @@ function Footer() {
               <img 
                 src="/logo.png" 
                 alt="Rudy's Repair" 
-                className="h-12 md:h-16 w-auto"
+                className="h-8 md:h-12 w-auto"
               />
               <span className="text-white text-xl font-bold leading-tight tracking-tight uppercase" style={{ fontFamily: "'Poppins', sans-serif" }}>Rudy's Repair</span>
             </div>

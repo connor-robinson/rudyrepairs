@@ -141,7 +141,7 @@ function Checkout() {
             <img 
               src="/logo.png" 
               alt="Rudy's Repair" 
-              className="h-14 md:h-20 w-auto object-contain -ml-2 md:-ml-3"
+              className="h-10 md:h-14 w-auto object-contain -ml-2 md:-ml-3"
             />
             <h2 className="text-white text-xl font-bold leading-tight tracking-tight uppercase" style={{ fontFamily: "'Poppins', sans-serif" }}>Rudy's Repair</h2>
           </div>

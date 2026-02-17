@@ -27,7 +27,7 @@ function Header() {
             <img 
               src="/logo.png" 
               alt="Rudy's Repair" 
-              className="h-12 md:h-20 w-auto object-contain -ml-2 md:-ml-3"
+              className="h-8 md:h-12 w-auto object-contain -ml-2 md:-ml-3"
             />
             <span className="text-white text-lg md:text-xl font-bold leading-tight tracking-tight uppercase" style={{ fontFamily: "'Poppins', sans-serif" }}>
               Rudy's Repair

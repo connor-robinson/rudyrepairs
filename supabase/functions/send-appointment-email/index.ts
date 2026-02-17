@@ -6,7 +6,11 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 const FROM_EMAIL = Deno.env.get('FROM_EMAIL') || 'noreply@rudysrepair.com';
-const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL') || 'admin@rudysrepair.com';
+// Support multiple admin emails (comma-separated)
+const ADMIN_EMAILS = (Deno.env.get('ADMIN_EMAIL') || 'admin@rudysrepair.com')
+  .split(',')
+  .map(email => email.trim())
+  .filter(email => email.length > 0);
 
 interface EmailPayload {
   appointmentId: string;
@@ -162,24 +166,26 @@ serve(async (req) => {
         console.error('Resend API error:', error);
       }
 
-      // Send admin notification
-      const adminEmailResponse = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${RESEND_API_KEY}`,
-        },
-        body: JSON.stringify({
-          from: FROM_EMAIL,
-          to: ADMIN_EMAIL,
-          subject: `New Appointment: ${appointment.customer_name} - ${appointmentDate}`,
-          html: adminEmailHtml,
-        }),
-      });
+      // Send admin notification to all admin emails
+      for (const adminEmail of ADMIN_EMAILS) {
+        const adminEmailResponse = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${RESEND_API_KEY}`,
+          },
+          body: JSON.stringify({
+            from: FROM_EMAIL,
+            to: adminEmail,
+            subject: `New Appointment: ${appointment.customer_name} - ${appointmentDate}`,
+            html: adminEmailHtml,
+          }),
+        });
 
-      if (!adminEmailResponse.ok) {
-        const error = await adminEmailResponse.json();
-        console.error('Resend API error (admin):', error);
+        if (!adminEmailResponse.ok) {
+          const error = await adminEmailResponse.json();
+          console.error(`Resend API error (admin ${adminEmail}):`, error);
+        }
       }
 
       // Update appointment to mark email as sent

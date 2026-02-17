@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { MdArrowBack, MdExpandMore, MdMyLocation, MdCalendarToday, MdAccessTime, MdChevronLeft, MdChevronRight, MdCheckCircle, MdError } from 'react-icons/md';
+import { MdArrowBack, MdExpandMore, MdMyLocation, MdCalendarToday } from 'react-icons/md';
 import { services, formatPrice } from '../data/services';
-import { supabase } from '../lib/supabase';
 
 function Checkout() {
   const navigate = useNavigate();
@@ -19,18 +18,6 @@ function Checkout() {
   const [customerPhone, setCustomerPhone] = useState('');
   const [vehicleModel, setVehicleModel] = useState('');
   
-  // Calendar state
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedTime, setSelectedTime] = useState(null);
-  const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
-  const [checkingAvailability, setCheckingAvailability] = useState(false);
-  
-  // Appointment submission state
-  const [submitting, setSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState('');
-  
   // Get order data from location state, or default to empty
   const orderData = location.state || null;
   const [orderItems, setOrderItems] = useState(() => {
@@ -46,221 +33,12 @@ function Checkout() {
   
   const totalPrice = orderItems.reduce((sum, item) => sum + item.price, 0);
   const isBundle = orderItems.length > 1;
-  
-  // Available time slots (9 AM to 5 PM, every hour)
-  const timeSlots = [
-    '09:00', '10:00', '11:00', '12:00', 
-    '13:00', '14:00', '15:00', '16:00', '17:00'
-  ];
 
   const handleServiceSelect = (service) => {
     // If selecting a service, replace current order with single service
     setOrderItems([service]);
     setDropdownOpen(false);
   };
-
-  // Calendar helper functions
-  const getDaysInMonth = (date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-    const startingDayOfWeek = firstDay.getDay();
-    
-    const days = [];
-    
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push(null);
-    }
-    
-    // Add all days of the month
-    for (let day = 1; day <= daysInMonth; day++) {
-      days.push(new Date(year, month, day));
-    }
-    
-    return days;
-  };
-
-  const isToday = (date) => {
-    if (!date) return false;
-    const today = new Date();
-    return date.getDate() === today.getDate() &&
-           date.getMonth() === today.getMonth() &&
-           date.getFullYear() === today.getFullYear();
-  };
-
-  const isPastDate = (date) => {
-    if (!date) return false;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const checkDate = new Date(date);
-    checkDate.setHours(0, 0, 0, 0);
-    return checkDate < today;
-  };
-
-  const isSelectedDate = (date) => {
-    if (!date || !selectedDate) return false;
-    return date.getDate() === selectedDate.getDate() &&
-           date.getMonth() === selectedDate.getMonth() &&
-           date.getFullYear() === selectedDate.getFullYear();
-  };
-
-  const formatDateDisplay = (date) => {
-    if (!date) return '';
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return date.toLocaleDateString('en-GB', options);
-  };
-
-  const handleDateSelect = async (date) => {
-    if (date && !isPastDate(date)) {
-      setSelectedDate(date);
-      setSelectedTime(null); // Reset time when date changes
-      await checkAvailability(date);
-    }
-  };
-
-  // Check availability for a specific date
-  const checkAvailability = async (date) => {
-    if (!date) return;
-    
-    setCheckingAvailability(true);
-    try {
-      const dateString = date.toISOString().split('T')[0];
-      
-      // Check if slots exist for this date
-      const { data: slots, error } = await supabase
-        .from('availability_slots')
-        .select('*')
-        .eq('date', dateString)
-        .eq('is_available', true)
-        .order('time_slot', { ascending: true });
-
-      if (error) throw error;
-
-      // If no slots exist, create default available slots
-      if (!slots || slots.length === 0) {
-        const defaultSlots = timeSlots.map(time => ({
-          date: dateString,
-          time_slot: time,
-          is_available: true
-        }));
-
-        const { data: inserted, error: insertError } = await supabase
-          .from('availability_slots')
-          .insert(defaultSlots)
-          .select();
-
-        if (insertError) throw insertError;
-        setAvailableTimeSlots(inserted.map(s => s.time_slot));
-      } else {
-        setAvailableTimeSlots(slots.map(s => s.time_slot));
-      }
-    } catch (error) {
-      console.error('Error checking availability:', error);
-      // If Supabase isn't configured, allow all time slots
-      setAvailableTimeSlots(timeSlots);
-    } finally {
-      setCheckingAvailability(false);
-    }
-  };
-
-  // Handle appointment submission
-  const handleConfirmAppointment = async () => {
-    // Validate form
-    if (!customerName || !customerEmail || !selectedDate || !selectedTime) {
-      setSubmitError('Please fill in all required fields and select a date and time.');
-      return;
-    }
-
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(customerEmail)) {
-      setSubmitError('Please enter a valid email address.');
-      return;
-    }
-
-    setSubmitting(true);
-    setSubmitError('');
-
-    try {
-      const appointmentDate = selectedDate.toISOString().split('T')[0];
-      
-      // First, check if the slot is still available
-      const { data: slotCheck, error: slotError } = await supabase
-        .from('availability_slots')
-        .select('*')
-        .eq('date', appointmentDate)
-        .eq('time_slot', selectedTime)
-        .eq('is_available', true)
-        .single();
-
-      if (slotError || !slotCheck) {
-        throw new Error('This time slot is no longer available. Please select another time.');
-      }
-
-      // Create appointment
-      const { data: appointment, error: appointmentError } = await supabase
-        .from('appointments')
-        .insert({
-          customer_name: customerName,
-          customer_email: customerEmail,
-          customer_phone: customerPhone || null,
-          vehicle_model: vehicleModel || null,
-          address: address || null,
-          appointment_date: appointmentDate,
-          appointment_time: selectedTime,
-          services: orderItems,
-          total_price: totalPrice,
-          status: 'pending'
-        })
-        .select()
-        .single();
-
-      if (appointmentError) throw appointmentError;
-
-      // Trigger email notification (via Supabase Edge Function or webhook)
-      try {
-        // Call email function if available
-        const { error: emailError } = await supabase.functions.invoke('send-appointment-email', {
-          body: { appointmentId: appointment.id }
-        });
-        
-        if (emailError) {
-          console.warn('Email notification failed:', emailError);
-          // Don't fail the appointment if email fails
-        }
-      } catch (emailErr) {
-        console.warn('Email service not configured:', emailErr);
-      }
-
-      setSubmitSuccess(true);
-      
-      // Redirect after 3 seconds
-      setTimeout(() => {
-        navigate('/', { state: { appointmentConfirmed: true } });
-      }, 3000);
-
-    } catch (error) {
-      console.error('Error creating appointment:', error);
-      setSubmitError(error.message || 'Failed to create appointment. Please try again.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handlePreviousMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
-  };
-
-  const handleNextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
-  };
-
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                      'July', 'August', 'September', 'October', 'November', 'December'];
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -278,6 +56,17 @@ function Checkout() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [dropdownOpen]);
+
+  // Load Calendly widget script once
+  useEffect(() => {
+    const existingScript = document.querySelector('script[src="https://assets.calendly.com/assets/external/widget.js"]');
+    if (!existingScript) {
+      const script = document.createElement('script');
+      script.src = 'https://assets.calendly.com/assets/external/widget.js';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, []);
 
   // Get user's location and reverse geocode to address
   const handleGetLocation = () => {
@@ -363,6 +152,23 @@ function Checkout() {
       }
     );
   };
+
+  // Calendly inline embed URL with pre-filled details
+  const calendlyBaseUrl = 'https://calendly.com/ansonchanw/bookrepair';
+
+  const calendlyParams = new URLSearchParams({
+    background_color: '000000',
+    text_color: 'ffffff',
+    primary_color: '8b3838'
+  });
+
+  if (customerName) calendlyParams.set('name', customerName);
+  if (customerEmail) calendlyParams.set('email', customerEmail);
+  if (vehicleModel) calendlyParams.set('a1', vehicleModel);
+  if (address) calendlyParams.set('a2', address);
+  if (customerPhone) calendlyParams.set('a3', customerPhone);
+
+  const calendlyUrl = `${calendlyBaseUrl}?${calendlyParams.toString()}`;
 
   return (
     <div className="bg-background-light dark:bg-background-dark font-display text-white transition-colors duration-300 min-h-screen">
@@ -560,175 +366,20 @@ function Checkout() {
                   Book your appointment now and pay on-site after service completion. No payment required upfront.
                 </p>
               </div>
-              
-              {/* Calendar */}
+
               <div className="bg-[#1a1a1a] border border-[#362b2b] rounded-lg p-6">
-                {/* Month Navigation */}
-                <div className="flex items-center justify-between mb-6">
-                  <button
-                    onClick={handlePreviousMonth}
-                    className="p-2 hover:bg-white/5 rounded-lg transition-colors"
-                    aria-label="Previous month"
-                  >
-                    <MdChevronLeft className="text-white text-xl" />
-                  </button>
-                  <h4 className="text-white text-lg font-medium">
-                    {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
-                  </h4>
-                  <button
-                    onClick={handleNextMonth}
-                    className="p-2 hover:bg-white/5 rounded-lg transition-colors"
-                    aria-label="Next month"
-                  >
-                    <MdChevronRight className="text-white text-xl" />
-                  </button>
-                </div>
-
-                {/* Calendar Grid */}
-                <div className="grid grid-cols-7 gap-2 mb-4">
-                  {/* Day headers */}
-                  {dayNames.map((day) => (
-                    <div key={day} className="text-center text-[#b5a1a1] text-xs font-bold py-2">
-                      {day}
-                    </div>
-                  ))}
-                  
-                  {/* Calendar days */}
-                  {getDaysInMonth(currentMonth).map((date, index) => {
-                    if (!date) {
-                      return <div key={`empty-${index}`} className="aspect-square" />;
-                    }
-                    
-                    const isPast = isPastDate(date);
-                    const isSelected = isSelectedDate(date);
-                    const isTodayDate = isToday(date);
-                    
-                    return (
-                      <button
-                        key={date.toISOString()}
-                        onClick={() => handleDateSelect(date)}
-                        disabled={isPast}
-                        className={`
-                          aspect-square rounded-lg text-sm font-medium transition-all
-                          ${isPast 
-                            ? 'text-[#362b2b] cursor-not-allowed opacity-30' 
-                            : isSelected
-                            ? 'bg-[#a12b2b] text-white'
-                            : isTodayDate
-                            ? 'border-2 border-[#a12b2b] text-white hover:bg-[#a12b2b]/20'
-                            : 'text-[#b5a1a1] hover:bg-white/5 hover:text-white'
-                          }
-                        `}
-                      >
-                        {date.getDate()}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Selected Date Display */}
-                {selectedDate && (
-                  <div className="mt-4 pt-4 border-t border-[#362b2b]">
-                    <p className="text-[#b5a1a1] text-xs font-bold tracking-[0.15em] uppercase mb-3">
-                      Selected Date
-                    </p>
-                    <p className="text-white text-sm font-medium mb-4">
-                      {formatDateDisplay(selectedDate)}
-                    </p>
-                    
-                    {/* Time Slots */}
-                    <div>
-                      <p className="text-[#b5a1a1] text-xs font-bold tracking-[0.15em] uppercase mb-3 flex items-center gap-2">
-                        <MdAccessTime className="text-sm" />
-                        Select Time
-                        {checkingAvailability && (
-                          <span className="text-xs text-[#b5a1a1] ml-2">(Checking availability...)</span>
-                        )}
-                      </p>
-                      {checkingAvailability ? (
-                        <div className="text-center py-4 text-[#b5a1a1] text-sm">Loading available times...</div>
-                      ) : (
-                        <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
-                          {timeSlots.map((time) => {
-                            const isAvailable = availableTimeSlots.includes(time);
-                            const isSelected = selectedTime === time;
-                            
-                            return (
-                              <button
-                                key={time}
-                                onClick={() => isAvailable && setSelectedTime(time)}
-                                disabled={!isAvailable}
-                                className={`
-                                  py-2 px-3 rounded-lg text-sm font-medium transition-all
-                                  ${!isAvailable
-                                    ? 'bg-[#362b2b] text-[#362b2b] cursor-not-allowed opacity-30'
-                                    : isSelected
-                                    ? 'bg-[#a12b2b] text-white'
-                                    : 'bg-[#121212] border border-[#362b2b] text-[#b5a1a1] hover:border-[#a12b2b] hover:text-white'
-                                  }
-                                `}
-                                title={!isAvailable ? 'This time slot is not available' : ''}
-                              >
-                                {time}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {!selectedDate && (
-                  <p className="text-center text-[#b5a1a1] text-xs mt-4">
-                    Select a date to choose your preferred time
-                  </p>
-                )}
+                <p className="text-[#b5a1a1] text-xs mb-4">
+                  Fill in your details above, then use the calendar below to pick a date and time that works for you.
+                </p>
+                <div
+                  className="calendly-inline-widget"
+                  data-url={calendlyUrl}
+                  style={{ minWidth: '320px', height: '700px' }}
+                />
+                <p className="text-[#b5a1a1] text-[10px] mt-4 text-center">
+                  Scheduling is handled securely by Calendly. You'll receive an email confirmation after booking.
+                </p>
               </div>
-            </section>
-
-            <section className="pt-8 space-y-6">
-              {submitSuccess ? (
-                <div className="bg-green-600/20 border border-green-600 rounded-lg p-6 text-center">
-                  <MdCheckCircle className="text-green-400 text-4xl mx-auto mb-4" />
-                  <h3 className="text-white text-lg font-bold mb-2">Appointment Confirmed!</h3>
-                  <p className="text-[#b5a1a1] text-sm mb-4">
-                    Your appointment has been scheduled for {formatDateDisplay(selectedDate)} at {selectedTime}
-                  </p>
-                  <p className="text-[#b5a1a1] text-xs">
-                    A confirmation email has been sent to {customerEmail}
-                  </p>
-                  <p className="text-[#b5a1a1] text-xs mt-4">
-                    Redirecting to home page...
-                  </p>
-                </div>
-              ) : (
-                <>
-                  {submitError && (
-                    <div className="bg-red-600/20 border border-red-600 rounded-lg p-4 flex items-start gap-3">
-                      <MdError className="text-red-400 text-xl flex-shrink-0 mt-0.5" />
-                      <p className="text-red-400 text-sm">{submitError}</p>
-                    </div>
-                  )}
-                  <button 
-                    onClick={handleConfirmAppointment}
-                    disabled={!selectedDate || !selectedTime || !customerName || !customerEmail || submitting}
-                    className={`w-full py-5 rounded-lg text-sm font-bold tracking-[0.25em] uppercase transition-all ${
-                      selectedDate && selectedTime && customerName && customerEmail && !submitting
-                        ? 'bg-[#a12b2b] hover:bg-[#a12b2b]/90 text-white'
-                        : 'bg-[#362b2b] text-[#b5a1a1] cursor-not-allowed'
-                    }`}
-                  >
-                    {submitting ? 'Creating Appointment...' : selectedDate && selectedTime && customerName && customerEmail ? 'Confirm Appointment' : 'Fill All Fields & Select Date & Time'}
-                  </button>
-                  <p className="text-center text-[#b5a1a1] text-[10px] font-light leading-relaxed">
-                    By confirming this appointment, you agree to Rudy's Repair{' '}
-                    <a className="underline hover:text-white transition-colors" href="#">Terms of Service</a> and{' '}
-                    <a className="underline hover:text-white transition-colors" href="#">Privacy Policy</a>. 
-                    Payment will be collected on-site after service completion.
-                  </p>
-                </>
-              )}
             </section>
           </div>
         </main>

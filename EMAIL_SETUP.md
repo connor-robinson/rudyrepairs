@@ -33,7 +33,9 @@ The appointment system includes automatic email notifications sent to both custo
    - Add secrets:
      - `RESEND_API_KEY`: Your Resend API key
      - `FROM_EMAIL`: Your verified sender email (e.g., noreply@yourdomain.com)
-     - `ADMIN_EMAIL`: Email to receive admin notifications
+     - `ADMIN_EMAIL`: Email(s) to receive admin notifications
+       - Single: `admin@yourdomain.com`
+       - Multiple (comma-separated): `admin@yourdomain.com,manager@yourdomain.com`
      - `ADMIN_DASHBOARD_URL`: URL to your admin dashboard (optional)
 
 5. Deploy the function:

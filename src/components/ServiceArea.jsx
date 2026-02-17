@@ -373,7 +373,7 @@ function ServiceArea() {
   const hasApiKey = GOOGLE_MAPS_API_KEY && GOOGLE_MAPS_API_KEY !== '';
 
   return (
-    <section className="py-24 bg-[#121212] border-b border-[#362b2b]/50" id="location">
+    <section className="py-16 md:py-24 bg-[#121212] border-b border-[#362b2b]/50" id="location">
       <div className="max-w-[1200px] mx-auto px-6 md:px-20">
         <div className="mb-12">
           <p className="text-[#b5a1a1] text-xs font-bold tracking-[0.2em] uppercase mb-4">Service Area</p>

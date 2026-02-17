@@ -24,7 +24,7 @@ function FAQ() {
   ];
 
   return (
-    <section className="py-24 bg-[#121212] border-b border-[#362b2b]/50" id="faq">
+    <section className="py-16 md:py-24 bg-[#121212] border-b border-[#362b2b]/50" id="faq">
       <div className="max-w-[1200px] mx-auto px-6 md:px-20">
         <div className="mb-12 text-center">
           <h2 className="font-display text-white text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-12">FAQ</h2>

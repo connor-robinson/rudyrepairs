@@ -24,7 +24,7 @@ function Hero() {
   }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-x-hidden bg-[#121212]">
+    <section className="relative min-h-[95vh] md:min-h-screen flex items-center overflow-x-hidden bg-[#121212]">
       <div className="absolute inset-0 z-0 overflow-hidden">
         <img
           alt="Happy customer with repaired car"
@@ -33,7 +33,7 @@ function Hero() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#121212]/40 to-[#121212]"></div>
       </div>
-      <div className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-20 py-24 w-full pt-32">
+      <div className="relative z-10 max-w-[1200px] mx-auto px-6 md:px-20 py-16 md:py-24 w-full pt-20 md:pt-32">
         <div className="max-w-2xl">
           <h1 className="font-display text-white text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight mb-8">
             Need <span className="text-[#a12b2b]">repairs?</span>
@@ -50,7 +50,7 @@ function Hero() {
             >
               Order Now
             </button>
-            <div className="flex items-center gap-4 bg-[#181818] px-6 py-5 h-[60px]">
+            <div className="flex items-center gap-4 bg-[#181818] px-6 py-5 h-[70px]">
               <div className="flex -space-x-3">
                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#121212] bg-[#121212]">
                   <img

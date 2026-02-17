@@ -66,7 +66,7 @@ function Pricing() {
   const orderableServices = services.filter(s => s.orderable);
 
   return (
-    <section className={`py-24 bg-[#121212] border-b border-[#362b2b]/50 ${bundleMode && selectedServices.length > 0 ? 'pb-32' : ''}`} id="pricing">
+    <section className={`py-16 md:py-24 bg-[#121212] border-b border-[#362b2b]/50 ${bundleMode && selectedServices.length > 0 ? 'pb-24 md:pb-32' : ''}`} id="pricing">
       <div className="max-w-[1200px] mx-auto px-6 md:px-20">
         <div className="mb-12">
           <p className="text-[#b5a1a1] text-xs font-bold tracking-[0.2em] uppercase mb-4">Pricing</p>
